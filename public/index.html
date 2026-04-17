@@ -245,14 +245,9 @@ function changeDate(id, delta) {
 
 // SYNC
 async function syncData() {
-    if (!serverIP) {
-        serverIP = prompt('Enter laptop IP (e.g. 192.168.10.14):');
-        if (!serverIP) return;
-        localStorage.setItem('serverIP', serverIP);
-    }
     showToast('Syncing...');
     try {
-        const res = await fetch('http://' + serverIP + ':3000/api/sync', {
+        const res = await fetch('https://mabakers.bonto.run/api/sync', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(appData)
@@ -261,12 +256,12 @@ async function syncData() {
             appData = await res.json();
             saveLocal();
             renderAll();
-            showToast('Synced!');
+            showToast('Synced successfully!');
         } else {
             showToast('Sync failed!');
         }
     } catch(e) {
-        showToast('Cannot reach laptop!');
+        showToast('Cannot reach server!');
     }
 }
 
