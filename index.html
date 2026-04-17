@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MA Bakers">
+<link rel="apple-touch-icon" href="logo.png">
+    <title>MA Bakers (Shawarma)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0d0d0d; color: white; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+        .header { background: #111; padding: 15px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
+        .header-title { font-size: 18px; font-weight: bold; }
+        .header-sub { font-size: 11px; color: #666; }
+        .sync-btn { margin-left: auto; background: #222; border: 1px solid #333; color: white; padding: 8px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #111; border-top: 1px solid #222; display: flex; padding: 8px 0 20px; z-index: 100; }
+        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 6px; border: none; background: none; color: #666; }
+        .nav-btn.active { color: white; }
+        .nav-icon { font-size: 20px; }
+        .nav-label { font-size: 10px; }
+        .page { display: none; padding: 15px; padding-bottom: 100px; }
+        .page.active { display: block; }
+        .card { background: #161616; border: 1px solid #222; border-radius: 12px; padding: 15px; margin-bottom: 12px; }
+        .card-title { font-size: 12px; font-weight: bold; color: #666; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .form-group { margin-bottom: 10px; }
+        .form-label { font-size: 12px; color: #666; margin-bottom: 4px; display: block; }
+        .form-input { width: 100%; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 11px; color: white; font-size: 15px; outline: none; }
+        select.form-input { appearance: none; }
+        .btn { width: 100%; padding: 13px; border-radius: 10px; border: none; font-size: 15px; font-weight: bold; cursor: pointer; margin-bottom: 8px; }
+        .btn-white { background: white; color: black; }
+        .btn-dark { background: #222; color: white; border: 1px solid #333; }
+        .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+        .stat-box { background: #1a1a1a; border: 1px solid #222; border-radius: 10px; padding: 10px; text-align: center; }
+        .stat-box.full { grid-column: span 2; }
+        .stat-lbl { font-size: 11px; color: #555; margin-bottom: 3px; }
+        .stat-val { font-size: 15px; font-weight: bold; }
+        .orange { color: #ffaa00; }
+        .green { color: #00ff88; }
+        .date-row { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+        .arr-btn { background: #1a1a1a; border: 1px solid #2a2a2a; color: white; width: 40px; height: 40px; border-radius: 8px; font-size: 16px; cursor: pointer; flex-shrink: 0; }
+        .row { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid #1a1a1a; }
+        .row:last-child { border-bottom: none; }
+        .row-name { font-size: 14px; font-weight: bold; }
+        .row-sub { font-size: 11px; color: #555; margin-top: 2px; }
+        .row-amt { font-size: 14px; font-weight: bold; }
+        .empty { text-align: center; color: #444; padding: 25px; font-size: 13px; }
+        .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #222; color: white; padding: 10px 18px; border-radius: 10px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; border: 1px solid #333; white-space: nowrap; }
+        .toast.show { opacity: 1; }
+        .status { text-align: center; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: bold; margin-bottom: 10px; display: none; }
+        .status.show { display: block; }
+        .sec-title { font-size: 18px; font-weight: bold; margin-bottom: 14px; }
+        .icon-btn { background: #1e1e1e; border: 1px solid #333; color: white; width: 32px; height: 32px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+        .flex-btns { display: flex; gap: 6px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <img src="logo.png" style="width:38px;height:38px;border-radius:50%;object-fit:cover;">
+    <div>
+        <div class="header-title">MA Bakers</div>
+        <div class="header-sub">Shawarma</div>
+    </div>
+    <button class="sync-btn" onclick="syncData()">🔄 Sync</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- DAILY PAGE -->
+<div class="page active" id="page-daily">
+    <div class="sec-title">📋 Daily Entry</div>
+    <div class="card">
+        <div class="card-title">Date & Customer</div>
+        <div class="date-row">
+            <button class="arr-btn" onclick="changeDate('entry-date', -1)">◀</button>
+            <input type="date" class="form-input" id="entry-date">
+            <button class="arr-btn" onclick="changeDate('entry-date', 1)">▶</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Customer</label>
+            <select class="form-input" id="entry-customer" onchange="calcPreview()">
+                <option value="">Select customer...</option>
+            </select>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-title">Quantities</div>
+        <div class="grid2">
+            <div class="form-group"><label class="form-label">🫓 Shawarma</label><input type="number" class="form-input" id="s-qty" placeholder="0" oninput="calcPreview()"></div>
+            <div class="form-group"><label class="form-label">🍔 Burger</label><input type="number" class="form-input" id="b-qty" placeholder="0" oninput="calcPreview()"></div>
+            <div class="form-group"><label class="form-label">🧻 Butter Paper</label><input type="number" class="form-input" id="bp-qty" placeholder="0" oninput="calcPreview()"></div>
+            <div class="form-group"><label class="form-label">🥫 Mayonnaise</label><input type="number" class="form-input" id="m-qty" placeholder="0" oninput="calcPreview()"></div>
+            <div class="form-group"><label class="form-label">🏠 Rent</label><input type="number" class="form-input" id="rent" placeholder="0" oninput="calcPreview()"></div>
+            <div class="form-group"><label class="form-label">💵 Payment</label><input type="number" class="form-input" id="payment" placeholder="0" oninput="calcPreview()"></div>
+        </div>
+    </div>
+    <div class="grid2">
+        <div class="stat-box"><div class="stat-lbl">Shawarma</div><div class="stat-val" id="c-s">Rs 0</div></div>
+        <div class="stat-box"><div class="stat-lbl">Burger</div><div class="stat-val" id="c-b">Rs 0</div></div>
+        <div class="stat-box"><div class="stat-lbl">Butter Paper</div><div class="stat-val" id="c-bp">Rs 0</div></div>
+        <div class="stat-box"><div class="stat-lbl">Mayonnaise</div><div class="stat-val" id="c-m">Rs 0</div></div>
+        <div class="stat-box"><div class="stat-lbl">Rent</div><div class="stat-val" id="c-r">Rs 0</div></div>
+        <div class="stat-box"><div class="stat-lbl">Day Total</div><div class="stat-val" id="c-dt">Rs 0</div></div>
+        <div class="stat-box"><div class="stat-lbl">Prev Outstanding</div><div class="stat-val" id="c-po">Rs 0</div></div>
+        <div class="stat-box full"><div class="stat-lbl">New Outstanding</div><div class="stat-val orange" id="c-no">Rs 0</div></div>
+    </div>
+    <div class="status" id="daily-status"></div>
+    <button class="btn btn-white" onclick="saveDailyEntry()">💾 Save Entry</button>
+</div>
+
+<!-- CUSTOMERS PAGE -->
+<div class="page" id="page-customers">
+    <div class="sec-title">👥 Customers</div>
+    <div class="card">
+        <div class="card-title" id="cust-form-title">➕ Add Customer</div>
+        <div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="c-name" placeholder="Customer name"></div>
+        <div class="form-group"><label class="form-label">Shawarma Rate (Rs)</label><input type="number" class="form-input" id="c-sr" placeholder="e.g. 8"></div>
+        <div class="form-group"><label class="form-label">Burger Rate (Rs)</label><input type="number" class="form-input" id="c-br" placeholder="0 if none"></div>
+        <div class="form-group"><label class="form-label">Butter Paper Rate (Rs)</label><input type="number" class="form-input" id="c-bpr" placeholder="0 if none"></div>
+        <div class="form-group"><label class="form-label">Mayonnaise Rate (Rs)</label><input type="number" class="form-input" id="c-mr" placeholder="0 if none"></div>
+        <div class="form-group"><label class="form-label">Opening Outstanding (Rs)</label><input type="number" class="form-input" id="c-oo" placeholder="From register"></div>
+        <button class="btn btn-white" id="cust-save-btn" onclick="saveCustomer()">💾 Save</button>
+        <button class="btn btn-dark" onclick="cancelCust()">❌ Cancel</button>
+    </div>
+    <div class="card">
+        <div class="card-title">Customer List</div>
+        <div id="cust-list"><div class="empty">No customers yet</div></div>
+    </div>
+</div>
+
+<!-- OUTSTANDING PAGE -->
+<div class="page" id="page-outstanding">
+    <div class="sec-title">⚠️ Outstanding</div>
+    <button class="btn btn-dark" onclick="renderOutstanding()" style="margin-bottom:12px">🔄 Refresh</button>
+    <div class="card"><div id="out-list"><div class="empty">Loading...</div></div></div>
+</div>
+
+<!-- SUMMARY PAGE -->
+<div class="page" id="page-summary">
+    <div class="sec-title">📊 Daily Summary</div>
+    <div class="card">
+        <div class="date-row">
+            <button class="arr-btn" onclick="changeDate('sum-date', -1)">◀</button>
+            <input type="date" class="form-input" id="sum-date">
+            <button class="arr-btn" onclick="changeDate('sum-date', 1)">▶</button>
+        </div>
+        <button class="btn btn-white" onclick="renderSummary()">📊 View Summary</button>
+    </div>
+    <div id="sum-content"></div>
+</div>
+
+<!-- MONTHLY PAGE -->
+<div class="page" id="page-monthly">
+    <div class="sec-title">📅 Monthly Report</div>
+    <div class="card">
+        <div class="form-group"><label class="form-label">Year</label><input type="number" class="form-input" id="mon-year" placeholder="2026"></div>
+        <div class="form-group"><label class="form-label">Month</label>
+            <select class="form-input" id="mon-month">
+                <option value="01">January</option><option value="02">February</option>
+                <option value="03">March</option><option value="04">April</option>
+                <option value="05">May</option><option value="06">June</option>
+                <option value="07">July</option><option value="08">August</option>
+                <option value="09">September</option><option value="10">October</option>
+                <option value="11">November</option><option value="12">December</option>
+            </select>
+        </div>
+        <button class="btn btn-white" onclick="renderMonthly()">📅 Generate</button>
+    </div>
+    <div id="mon-content"></div>
+</div>
+
+<!-- HISTORY PAGE -->
+<div class="page" id="page-history">
+    <div class="sec-title">🕐 History</div>
+    <div class="card">
+        <div class="date-row">
+            <button class="arr-btn" onclick="changeDate('hist-date', -1)">◀</button>
+            <input type="date" class="form-input" id="hist-date">
+            <button class="arr-btn" onclick="changeDate('hist-date', 1)">▶</button>
+        </div>
+        <button class="btn btn-white" onclick="renderHistory()">🕐 View History</button>
+    </div>
+    <div id="hist-content"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+    <button class="nav-btn active" id="nav-daily" onclick="showPage('daily')"><span class="nav-icon">📋</span><span class="nav-label">Daily</span></button>
+    <button class="nav-btn" id="nav-customers" onclick="showPage('customers')"><span class="nav-icon">👥</span><span class="nav-label">Customers</span></button>
+    <button class="nav-btn" id="nav-outstanding" onclick="showPage('outstanding')"><span class="nav-icon">⚠️</span><span class="nav-label">Outstanding</span></button>
+    <button class="nav-btn" id="nav-summary" onclick="showPage('summary')"><span class="nav-icon">📊</span><span class="nav-label">Summary</span></button>
+    <button class="nav-btn" id="nav-monthly" onclick="showPage('monthly')"><span class="nav-icon">📅</span><span class="nav-label">Monthly</span></button>
+    <button class="nav-btn" id="nav-history" onclick="showPage('history')"><span class="nav-icon">🕐</span><span class="nav-label">History</span></button>
+</div>
+
+<script>
+let appData = { customers: {}, daily: {} };
+let editingCust = null;
+let serverIP = localStorage.getItem('serverIP') || '';
+
+function loadLocal() {
+    const s = localStorage.getItem('mabakers');
+    if (s) appData = JSON.parse(s);
+}
+
+function saveLocal() {
+    localStorage.setItem('mabakers', JSON.stringify(appData));
+}
+
+function today() {
+    return new Date().toISOString().split('T')[0];
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function showStatus(id, msg, cls) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = 'status show ' + cls;
+    setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    document.getElementById('nav-' + name).classList.add('active');
+    if (name === 'outstanding') renderOutstanding();
+}
+
+function changeDate(id, delta) {
+    const el = document.getElementById(id);
+    const d = new Date(el.value);
+    d.setDate(d.getDate() + delta);
+    el.value = d.toISOString().split('T')[0];
+    if (id === 'entry-date') calcPreview();
+}
+
+// SYNC
+async function syncData() {
+    if (!serverIP) {
+        serverIP = prompt('Enter laptop IP (e.g. 192.168.10.14):');
+        if (!serverIP) return;
+        localStorage.setItem('serverIP', serverIP);
+    }
+    showToast('Syncing...');
+    try {
+        const res = await fetch('http://' + serverIP + ':3000/api/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(appData)
+        });
+        if (res.ok) {
+            appData = await res.json();
+            saveLocal();
+            renderAll();
+            showToast('Synced!');
+        } else {
+            showToast('Sync failed!');
+        }
+    } catch(e) {
+        showToast('Cannot reach laptop!');
+    }
+}
+
+// CUSTOMERS
+function renderCustomers() {
+    const names = Object.keys(appData.customers);
+    const list = document.getElementById('cust-list');
+    if (!names.length) { list.innerHTML = '<div class="empty">No customers yet</div>'; return; }
+    list.innerHTML = names.map(n => {
+        const c = appData.customers[n];
+        return '<div class="row"><div><div class="row-name">' + n + '</div><div class="row-sub">Shawarma: Rs ' + c.shawarma_rate + ' | Burger: ' + (c.burger_rate ? 'Rs ' + c.burger_rate : '-') + '</div><div class="row-sub">Butter: ' + (c.butter_rate ? 'Rs ' + c.butter_rate : '-') + ' | Mayo: ' + (c.mayo_rate ? 'Rs ' + c.mayo_rate : '-') + '</div></div><div class="flex-btns"><button class="icon-btn" onclick="editCust(\'' + n + '\')">✏️</button><button class="icon-btn" onclick="deleteCust(\'' + n + '\')">🗑️</button></div></div>';
+    }).join('');
+    const sel = document.getElementById('entry-customer');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">Select customer...</option>' + names.map(n => '<option value="' + n + '"' + (n === cur ? ' selected' : '') + '>' + n + '</option>').join('');
+}
+
+function saveCustomer() {
+    const name = document.getElementById('c-name').value.trim();
+    const sr = parseFloat(document.getElementById('c-sr').value || 0);
+    const br = parseFloat(document.getElementById('c-br').value || 0);
+    const bpr = parseFloat(document.getElementById('c-bpr').value || 0);
+    const mr = parseFloat(document.getElementById('c-mr').value || 0);
+    const oo = parseFloat(document.getElementById('c-oo').value || 0);
+    if (!name || !sr) { showToast('Enter name and shawarma rate!'); return; }
+    if (editingCust && editingCust !== name) {
+        delete appData.customers[editingCust];
+    }
+    appData.customers[name] = { shawarma_rate: sr, burger_rate: br, butter_rate: bpr, mayo_rate: mr, opening_outstanding: oo };
+    saveLocal();
+    cancelCust();
+    renderCustomers();
+    showToast('Customer saved!');
+}
+
+function editCust(name) {
+    const c = appData.customers[name];
+    editingCust = name;
+    document.getElementById('c-name').value = name;
+    document.getElementById('c-sr').value = c.shawarma_rate;
+    document.getElementById('c-br').value = c.burger_rate || '';
+    document.getElementById('c-bpr').value = c.butter_rate || '';
+    document.getElementById('c-mr').value = c.mayo_rate || '';
+    document.getElementById('c-oo').value = c.opening_outstanding || '';
+    document.getElementById('cust-form-title').textContent = 'Edit Customer';
+    document.getElementById('cust-save-btn').textContent = 'Update';
+}
+
+function cancelCust() {
+    editingCust = null;
+    ['c-name','c-sr','c-br','c-bpr','c-mr','c-oo'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('cust-form-title').textContent = 'Add Customer';
+    document.getElementById('cust-save-btn').textContent = 'Save';
+}
+
+function deleteCust(name) {
+    if (confirm('Delete ' + name + '?')) {
+        delete appData.customers[name];
+        saveLocal();
+        renderCustomers();
+    }
+}
+
+// DAILY
+function getPrevOut(name, date) {
+    const dates = Object.keys(appData.daily).filter(d => appData.daily[d][name] && d < date).sort();
+    if (dates.length) return appData.daily[dates[dates.length-1]][name].outstanding || 0;
+    return appData.customers[name] ? appData.customers[name].opening_outstanding || 0 : 0;
+}
+
+function calcPreview() {
+    const name = document.getElementById('entry-customer').value;
+    const date = document.getElementById('entry-date').value;
+    if (!name || !appData.customers[name]) return;
+    const c = appData.customers[name];
+    const sQ = parseFloat(document.getElementById('s-qty').value || 0);
+    const bQ = parseFloat(document.getElementById('b-qty').value || 0);
+    const bpQ = parseFloat(document.getElementById('bp-qty').value || 0);
+    const mQ = parseFloat(document.getElementById('m-qty').value || 0);
+    const r = parseFloat(document.getElementById('rent').value || 0);
+    const p = parseFloat(document.getElementById('payment').value || 0);
+    const sT = sQ * c.shawarma_rate;
+    const bT = bQ * (c.burger_rate || 0);
+    const bpT = bpQ * (c.butter_rate || 0);
+    const mT = mQ * (c.mayo_rate || 0);
+    const dt = sT + bT + bpT + mT + r;
+    const po = getPrevOut(name, date);
+    const no = po + dt - p;
+    document.getElementById('c-s').textContent = 'Rs ' + sT.toFixed(0);
+    document.getElementById('c-b').textContent = 'Rs ' + bT.toFixed(0);
+    document.getElementById('c-bp').textContent = 'Rs ' + bpT.toFixed(0);
+    document.getElementById('c-m').textContent = 'Rs ' + mT.toFixed(0);
+    document.getElementById('c-r').textContent = 'Rs ' + r.toFixed(0);
+    document.getElementById('c-dt').textContent = 'Rs ' + dt.toFixed(0);
+    document.getElementById('c-po').textContent = 'Rs ' + po.toFixed(0);
+    const noEl = document.getElementById('c-no');
+    noEl.textContent = 'Rs ' + no.toFixed(0);
+    noEl.className = 'stat-val ' + (no <= 0 ? 'green' : 'orange');
+}
+
+function saveDailyEntry() {
+    const name = document.getElementById('entry-customer').value;
+    const date = document.getElementById('entry-date').value;
+    if (!name || !appData.customers[name]) { showToast('Select a customer!'); return; }
+    const c = appData.customers[name];
+    const sQ = parseFloat(document.getElementById('s-qty').value || 0);
+    const bQ = parseFloat(document.getElementById('b-qty').value || 0);
+    const bpQ = parseFloat(document.getElementById('bp-qty').value || 0);
+    const mQ = parseFloat(document.getElementById('m-qty').value || 0);
+    const r = parseFloat(document.getElementById('rent').value || 0);
+    const p = parseFloat(document.getElementById('payment').value || 0);
+    const sT = sQ * c.shawarma_rate;
+    const bT = bQ * (c.burger_rate || 0);
+    const bpT = bpQ * (c.butter_rate || 0);
+    const mT = mQ * (c.mayo_rate || 0);
+    const dt = sT + bT + bpT + mT + r;
+    const po = getPrevOut(name, date);
+    const no = po + dt - p;
+    if (!appData.daily[date]) appData.daily[date] = {};
+    appData.daily[date][name] = { shawarma_qty: sQ, shawarma_rate: c.shawarma_rate, shawarma_total: sT, burger_qty: bQ, burger_rate: c.burger_rate||0, burger_total: bT, butter_qty: bpQ, butter_rate: c.butter_rate||0, butter_total: bpT, mayo_qty: mQ, mayo_rate: c.mayo_rate||0, mayo_total: mT, rent: r, day_total: dt, payment: p, prev_outstanding: po, outstanding: no };
+    saveLocal();
+    showStatus('daily-status', 'Saved! Outstanding: Rs ' + no.toFixed(0), no <= 0 ? 'green' : 'orange');
+    ['s-qty','b-qty','bp-qty','m-qty','rent','payment'].forEach(id => document.getElementById(id).value = '');
+    calcPreview();
+}
+
+// OUTSTANDING
+function renderOutstanding() {
+    const daily = appData.daily;
+    const items = [];
+    for (const name in appData.customers) {
+        const dates = Object.keys(daily).filter(d => daily[d][name]).sort();
+        if (dates.length) {
+            const amt = daily[dates[dates.length-1]][name].outstanding || 0;
+            if (amt > 0) items.push({ name, date: dates[dates.length-1], amt });
+        } else {
+            const op = appData.customers[name].opening_outstanding || 0;
+            if (op > 0) items.push({ name, date: 'No entries', amt: op });
+        }
+    }
+    const list = document.getElementById('out-list');
+    if (!items.length) { list.innerHTML = '<div class="empty">All customers fully paid!</div>'; return; }
+    list.innerHTML = items.map(i => '<div class="row"><div><div class="row-name">' + i.name + '</div><div class="row-sub">' + i.date + '</div></div><div class="row-amt orange">Rs ' + i.amt.toFixed(0) + '</div></div>').join('');
+}
+
+// SUMMARY
+function renderSummary() {
+    const date = document.getElementById('sum-date').value;
+    const entries = appData.daily[date];
+    const content = document.getElementById('sum-content');
+    if (!entries || !Object.keys(entries).length) { showToast('No entries for this date'); content.innerHTML = ''; return; }
+    let ts=0,tb=0,tbp=0,tm=0,tr=0,tp=0,to=0;
+    const rows = Object.entries(entries).map(([name, e]) => {
+        ts+=e.shawarma_total||0; tb+=e.burger_total||0; tbp+=e.butter_total||0; tm+=e.mayo_total||0; tr+=e.rent||0; tp+=e.payment||0;
+        const out = e.outstanding||0; to+=Math.max(out,0);
+        return '<div class="row"><div><div class="row-name">' + name + '</div><div class="row-sub">Shawarma: Rs ' + (e.shawarma_total||0).toFixed(0) + ' | Burger: Rs ' + (e.burger_total||0).toFixed(0) + '</div><div class="row-sub">Butter: Rs ' + (e.butter_total||0).toFixed(0) + ' | Mayo: Rs ' + (e.mayo_total||0).toFixed(0) + '</div><div class="row-sub">Rent: Rs ' + (e.rent||0).toFixed(0) + ' | Payment: Rs ' + (e.payment||0).toFixed(0) + '</div></div><div class="row-amt ' + (out<=0?'green':'orange') + '">' + (out<=0?'PAID':'Rs '+out.toFixed(0)) + '</div></div>';
+    }).join('');
+    content.innerHTML = '<div class="grid2"><div class="stat-box"><div class="stat-lbl">Shawarma</div><div class="stat-val">Rs ' + ts.toFixed(0) + '</div></div><div class="stat-box"><div class="stat-lbl">Burger</div><div class="stat-val">Rs ' + tb.toFixed(0) + '</div></div><div class="stat-box"><div class="stat-lbl">Butter Paper</div><div class="stat-val">Rs ' + tbp.toFixed(0) + '</div></div><div class="stat-box"><div class="stat-lbl">Mayonnaise</div><div class="stat-val">Rs ' + tm.toFixed(0) + '</div></div><div class="stat-box"><div class="stat-lbl">Rent</div><div class="stat-val">Rs ' + tr.toFixed(0) + '</div></div><div class="stat-box"><div class="stat-lbl">Payment</div><div class="stat-val">Rs ' + tp.toFixed(0) + '</div></div><div class="stat-box full"><div class="stat-lbl">Outstanding</div><div class="stat-val orange">Rs ' + to.toFixed(0) + '</div></div></div><div class="card">' + rows + '</div>';
+}
+
+// MONTHLY
+function renderMonthly() {
+    const year = document.getElementById('mon-year').value;
+    const month = document.getElementById('mon-month').value;
+    const prefix = year + '-' + month;
+    const daily = appData.daily;
+    const content = document.getElementById('mon-content');
+    const monthDates = Object.keys(daily).filter(d => d.startsWith(prefix)).sort();
+    if (!monthDates.length) { showToast('No data for this month'); content.innerHTML = ''; return; }
+    const totals = {};
+    for (const d of monthDates) {
+        for (const [name, e] of Object.entries(daily[d])) {
+            if (!totals[name]) totals[name] = {s:0,b:0,bp:0,m:0,rent:0,pay:0};
+            totals[name].s+=e.shawarma_total||0; totals[name].b+=e.burger_total||0; totals[name].bp+=e.butter_total||0; totals[name].m+=e.mayo_total||0; totals[name].rent+=e.rent||0; totals[name].pay+=e.payment||0;
+        }
+    }
+    let ts=0,tb=0,tbp=0,tm=0,tr=0,tp=0,to=0;
+    const rows = Object.entries(totals).map(([name, t]) => {
+        ts+=t.s; tb+=t.b; tbp+=t.bp; tm+=t.m; tr+=t.rent; tp+=t.pay;
+        const ld = Object.keys(daily).filter(d => daily[d][name] && d.startsWith(prefix)).sort();
+        let out = 0;
+        if (ld.length) out = daily[ld[ld.length-1]][name].outstanding || 0;
+        if (out > 0) to += out;
+        return '<div class="row"><div><div class="row-name">' + name + '</div><div class="row-sub">Shawarma: Rs ' + t.s.toFixed(0) + ' | Burger: Rs ' + t.b.toFixed(0) + '</div><div class="row-sub">Butter: Rs ' + t.bp.toFixed(0) + ' | Mayo: Rs ' + t.m.toFixed(0) + '</div><div class="row-sub">Rent: Rs ' + t.rent.toFixed(0) + ' | Payment: Rs ' + t.pay.toFixed(0) + '</div></div><div class="row-amt ' + (out<=0?'green':'orange') + '">' + (out<=0?'PAID':'Rs '+out.toFixed(0)) + '</div></div>';
+    }).join('');
+    content.innerHTML = '<div class="grid2"><div class="stat-box"><div class="stat-lbl">Shawarma</div><div class="stat-val">Rs ' + ts.toFixed(0) + '</div></div><div class="stat-box"><div class="stat-lbl">Burger</div><div class="stat-val">Rs ' + tb.toFixed(0) + '</div></div><div class="stat-box"><div class="stat-lbl">Butter Paper</div><div class="stat-val">Rs ' + tbp.toFixed(0) + '</div></div><div class="stat-box"><div class="stat-lbl">Mayonnaise</div><div class="stat-val">Rs ' + tm.toFixed(0) + '</div></div><div class="stat-box"><div class="stat-lbl">Rent</div><div class="stat-val">Rs ' + tr.toFixed(0) + '</div></div><div class="stat-box"><div class="stat-lbl">Payment</div><div class="stat-val">Rs ' + tp.toFixed(0) + '</div></div><div class="stat-box full"><div class="stat-lbl">Outstanding</div><div class="stat-val orange">Rs ' + to.toFixed(0) + '</div></div></div><div class="card">' + rows + '</div>';
+}
+
+// HISTORY
+function renderHistory() {
+    const date = document.getElementById('hist-date').value;
+    const entries = appData.daily[date];
+    const content = document.getElementById('hist-content');
+    if (!entries || !Object.keys(entries).length) { showToast('No entries for this date'); content.innerHTML = ''; return; }
+    const rows = Object.entries(entries).map(([name, e]) => {
+        const out = e.outstanding||0;
+        return '<div class="row"><div><div class="row-name">' + name + '</div><div class="row-sub">Shawarma: Rs ' + (e.shawarma_total||0).toFixed(0) + ' | Burger: Rs ' + (e.burger_total||0).toFixed(0) + '</div><div class="row-sub">Butter: Rs ' + (e.butter_total||0).toFixed(0) + ' | Mayo: Rs ' + (e.mayo_total||0).toFixed(0) + '</div><div class="row-sub">Rent: Rs ' + (e.rent||0).toFixed(0) + ' | Payment: Rs ' + (e.payment||0).toFixed(0) + '</div><div class="row-sub">Prev Out: Rs ' + (e.prev_outstanding||0).toFixed(0) + '</div></div><div class="row-amt ' + (out<=0?'green':'orange') + '">' + (out<=0?'PAID':'Rs '+out.toFixed(0)) + '</div></div>';
+    }).join('');
+    content.innerHTML = '<div class="card">' + rows + '</div>';
+}
+
+function renderAll() { renderCustomers(); renderOutstanding(); }
+
+// SERVICE WORKER
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+}
+
+// SERVICE WORKER
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+}
+
+// INIT
+loadLocal();
+renderAll();
+document.getElementById('entry-date').value = today();
+document.getElementById('sum-date').value = today();
+document.getElementById('hist-date').value = today();
+document.getElementById('mon-year').value = new Date().getFullYear();
+document.getElementById('mon-month').value = String(new Date().getMonth()+1).padStart(2,'0');
+</script>
+</body>
+</html>
