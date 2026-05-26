@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MA Bakers">
+    <title>MA Bakers</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --gold: #C9A84C; --gold-light: #E8C97A; --gold-dark: #8B6914;
+            --gold-glow: rgba(201,168,76,0.15);
+            --bg: #0C0C0C; --bg2: #111111;
+            --card: #161410; --card2: #1C1A14;
+            --border: rgba(201,168,76,0.12);
+            --border-bright: rgba(201,168,76,0.3);
+            --text: #F5F0E8; --text2: #8A8070; --text3: #5A5040;
+            --green: #4CAF82; --red: #C94C4C;
+        }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at center, #1a1500 0%, #000000 70%); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #splash-ring { width: 140px; height: 140px; border-radius: 50%; border: 1px solid rgba(201,168,76,0.2); display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.5); transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 0 40px rgba(201,168,76,0.1), inset 0 0 40px rgba(201,168,76,0.05); }
+        #splash-ring.show { opacity: 1; transform: scale(1); }
+        #splash-logo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(201,168,76,0.4); }
+        #splash-name { font-size: 28px; font-weight: 300; letter-spacing: 8px; text-transform: uppercase; color: var(--gold-light); opacity: 0; transform: translateY(15px); transition: all 0.8s ease 0.8s; margin-top: 28px; }
+        #splash-name.show { opacity: 1; transform: translateY(0); }
+        #splash-sub { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; color: var(--text3); opacity: 0; transition: all 0.8s ease 1.1s; margin-top: 8px; }
+        #splash-sub.show { opacity: 1; }
+        #splash-line { width: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin-top: 32px; transition: width 1.5s ease 1s; }
+        #splash-line.show { width: 160px; }
+
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 9000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; }
+        #login-screen.hidden { display: none; }
+        .login-logo { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(201,168,76,0.4); box-shadow: 0 0 30px rgba(201,168,76,0.2); margin-bottom: 24px; }
+        .login-title { font-size: 26px; font-weight: 300; letter-spacing: 6px; text-transform: uppercase; color: var(--gold-light); margin-bottom: 8px; }
+        .login-sub { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--text3); margin-bottom: 40px; }
+        .login-card { width: 100%; max-width: 360px; background: var(--card); border: 1px solid var(--border-bright); border-radius: 16px; padding: 28px 22px; position: relative; overflow: hidden; }
+        .login-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+        .login-label { font-size: 10px; color: var(--text3); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; text-align: center; }
+        .login-input { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 12px; padding: 16px; color: var(--gold-light); font-size: 24px; text-align: center; outline: none; letter-spacing: 12px; font-weight: 600; margin-bottom: 16px; }
+        .login-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #C9A84C 0%, #8B6914 50%, #C9A84C 100%); color: #0C0C0C; border: none; border-radius: 12px; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 20px rgba(201,168,76,0.25); }
+        .login-error { color: var(--red); font-size: 12px; text-align: center; margin-top: 12px; display: none; letter-spacing: 1px; }
+        .login-error.show { display: block; }
+
+        .header { background: linear-gradient(180deg, rgba(20,18,12,0.98) 0%, rgba(12,12,12,0.95) 100%); padding: 48px 20px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); }
+        .header-logo { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid var(--gold-dark); box-shadow: 0 0 12px rgba(201,168,76,0.2); }
+        .header-title { font-size: 16px; font-weight: 600; letter-spacing: 1px; color: var(--gold-light); }
+        .header-sub { font-size: 9px; color: var(--text3); letter-spacing: 3px; text-transform: uppercase; }
+        .header-role { font-size: 9px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
+        .header-btns { margin-left: auto; display: flex; gap: 8px; }
+        .sync-btn, .logout-btn { background: transparent; border: 1px solid var(--border-bright); color: var(--gold); padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 600; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(180deg, rgba(12,12,12,0) 0%, rgba(10,10,8,0.99) 30%); border-top: 1px solid var(--border); display: flex; padding: 10px 0 50px; z-index: 100; backdrop-filter: blur(30px); }
+        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 4px 2px; border: none; background: none; position: relative; }
+        .nav-btn::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); transition: width 0.3s ease; }
+        .nav-btn.active::after { width: 30px; }
+        .nav-icon { width: 20px; height: 20px; opacity: 0.25; color: var(--text); transition: all 0.3s ease; }
+        .nav-btn.active .nav-icon { opacity: 1; color: var(--gold); stroke: var(--gold); }
+        .nav-label { font-size: 9px; color: var(--text3); letter-spacing: 0.5px; text-transform: uppercase; font-weight: 500; transition: color 0.3s; }
+        .nav-btn.active .nav-label { color: var(--gold); }
+
+        .page { display: none; padding: 16px; padding-bottom: 140px; }
+        .page.active { display: block; }
+
+        .sec-title { font-size: 22px; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; color: var(--text); margin-bottom: 4px; }
+        .sec-line { width: 40px; height: 1px; background: linear-gradient(90deg, var(--gold), transparent); margin-bottom: 16px; }
+
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; position: relative; overflow: hidden; }
+        .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent); }
+        .card-premium { background: linear-gradient(135deg, #161410 0%, #1C1A10 100%); border: 1px solid var(--border-bright); border-radius: 16px; padding: 16px; margin-bottom: 12px; position: relative; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.4); }
+        .card-premium::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+        .card-title { font-size: 10px; font-weight: 600; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        .card-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-bright), transparent); }
+
+        .form-group { margin-bottom: 12px; }
+        .form-label { font-size: 10px; color: var(--text3); margin-bottom: 6px; display: block; letter-spacing: 1px; text-transform: uppercase; font-weight: 500; }
+        .form-input { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-size: 15px; outline: none; transition: border-color 0.2s; font-family: inherit; }
+        .form-input:focus { border-color: var(--gold-dark); }
+        select.form-input { appearance: none; }
+
+        .btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; margin-bottom: 8px; letter-spacing: 1.5px; text-transform: uppercase; font-family: inherit; }
+        .btn:active { transform: scale(0.98); opacity: 0.9; }
+        .btn-gold { background: linear-gradient(135deg, #C9A84C 0%, #8B6914 50%, #C9A84C 100%); color: #0C0C0C; font-weight: 700; box-shadow: 0 4px 20px rgba(201,168,76,0.25); }
+        .btn-outline { background: transparent; color: var(--gold); border: 1px solid var(--border-bright); font-weight: 500; }
+        .btn-ghost { background: rgba(201,168,76,0.05); color: var(--text2); border: 1px solid var(--border); }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+        .stat-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px; padding: 12px; text-align: center; }
+        .stat-box.full { grid-column: span 2; }
+        .stat-box.highlight { border-color: var(--border-bright); background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(0,0,0,0.3)); }
+        .stat-lbl { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-weight: 500; }
+        .stat-val { font-size: 16px; font-weight: 600; color: var(--text); }
+        .gold-val { color: var(--gold-light) !important; }
+        .green-val { color: var(--green) !important; }
+
+        .date-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .arr-btn { background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: var(--gold); width: 42px; height: 42px; border-radius: 10px; font-size: 13px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+
+        .row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(201,168,76,0.05); }
+        .row:last-child { border-bottom: none; }
+        .row-name { font-size: 14px; font-weight: 500; color: var(--text); }
+        .row-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+        .badge-out { background: rgba(201,168,76,0.08); color: var(--gold-light); border: 1px solid rgba(201,168,76,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+        .badge-paid { background: rgba(76,175,130,0.08); color: var(--green); border: 1px solid rgba(76,175,130,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+
+        .toast { position: fixed; top: 95px; left: 50%; transform: translateX(-50%); background: var(--card2); border: 1px solid var(--border-bright); color: var(--gold-light); padding: 10px 22px; border-radius: 24px; font-size: 12px; font-weight: 500; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+        .toast.show { opacity: 1; }
+
+        .status { text-align: center; padding: 12px; border-radius: 10px; font-size: 12px; font-weight: 600; margin-bottom: 10px; display: none; text-transform: uppercase; }
+        .status.show { display: block; }
+        .status.success { background: rgba(76,175,130,0.08); color: var(--green); border: 1px solid rgba(76,175,130,0.15); }
+        .status.warning { background: rgba(201,168,76,0.08); color: var(--gold); border: 1px solid rgba(201,168,76,0.15); }
+
+        .empty { text-align: center; color: var(--text3); padding: 32px; font-size: 13px; }
+        .icon-btn { background: rgba(201,168,76,0.06); border: 1px solid var(--border); color: var(--gold); width: 34px; height: 34px; border-radius: 8px; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .flex-btns { display: flex; gap: 6px; }
+        .gold-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-bright), transparent); margin: 12px 0; }
+        .hero-stat { text-align: center; padding: 20px 16px; }
+        .hero-label { font-size: 10px; color: var(--text3); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+        .hero-value { font-size: 32px; font-weight: 300; color: var(--gold-light); letter-spacing: 1px; }
+
+        body.manager-mode .owner-only { display: none !important; }
+
+        .mode-toggle { display: flex; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 4px; margin-bottom: 14px; }
+        .mode-btn { flex: 1; padding: 11px; background: transparent; color: var(--text3); border: none; border-radius: 8px; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .mode-btn.active { background: linear-gradient(135deg, #C9A84C, #8B6914); color: #0C0C0C; box-shadow: 0 2px 12px rgba(201,168,76,0.3); }
+
+        .quick-cust { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 10px; position: relative; overflow: hidden; }
+        .quick-cust::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent); }
+        .quick-cust.has-data { border-color: var(--border-bright); background: linear-gradient(135deg, #161410, #1C1A10); }
+        .quick-name { font-size: 14px; font-weight: 600; color: var(--gold-light); letter-spacing: 0.5px; margin-bottom: 10px; }
+        .quick-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+        .quick-field { display: flex; flex-direction: column; gap: 3px; }
+        .quick-label { font-size: 8px; color: var(--text3); letter-spacing: 0.5px; text-transform: uppercase; font-weight: 500; }
+        .quick-input { background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 8px; padding: 8px 6px; color: var(--text); font-size: 14px; text-align: center; outline: none; font-family: inherit; -moz-appearance: textfield; }
+        .quick-input::-webkit-outer-spin-button, .quick-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .quick-input:focus { border-color: var(--gold-dark); }
+
+        .back-btn { background: transparent; border: 1px solid var(--border); color: var(--gold); padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 600; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; }
+        .entry-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 10px; }
+        .entry-date { font-size: 11px; color: var(--gold); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; margin-bottom: 8px; }
+
+        /* PDF Bill Styles */
+        .bill-container { background: white; color: black; padding: 20px; font-family: monospace; }
+        .bill-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 15px; }
+        .bill-title { font-size: 18px; font-weight: bold; letter-spacing: 3px; }
+        .bill-subtitle { font-size: 12px; margin-top: 5px; }
+        .bill-info { display: flex; justify-content: space-between; margin: 10px 0; font-size: 11px; }
+        .bill-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .bill-table th { border: 1px solid #000; padding: 8px; text-align: center; font-weight: bold; font-size: 10px; background: #f0f0f0; }
+        .bill-table td { border: 1px solid #000; padding: 8px; text-align: center; font-size: 10px; }
+        .bill-table .left { text-align: left; }
+        .bill-table .right { text-align: right; }
+        .bill-summary { margin: 15px 0; border-top: 2px solid #000; padding-top: 10px; }
+        .bill-summary-row { display: flex; justify-content: space-between; margin: 5px 0; font-size: 11px; }
+        .bill-total { border-top: 2px solid #000; border-bottom: 2px solid #000; padding: 8px 0; font-weight: bold; font-size: 12px; }
+        .bill-footer { text-align: center; margin-top: 20px; font-size: 10px; }
+    </style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+    <div id="splash-ring"><img src="logo.png" id="splash-logo" alt="MA Bakers"></div>
+    <div id="splash-name">MA Bakers</div>
+    <div id="splash-sub">Shawarma</div>
+    <div id="splash-line"></div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen" class="hidden">
+    <img src="logo.png" class="login-logo">
+    <div class="login-title">MA Bakers</div>
+    <div class="login-sub">Shawarma</div>
+    <div class="login-card">
+        <div class="login-label">Enter Password</div>
+        <input type="password" class="login-input" id="login-password" maxlength="4" inputmode="numeric" placeholder="••••">
+        <button class="login-btn" onclick="checkLogin()">Login</button>
+        <div class="login-error" id="login-error">Wrong password</div>
+    </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+    <img src="logo.png" class="header-logo" alt="MA Bakers">
+    <div>
+        <div class="header-title">MA Bakers</div>
+        <div class="header-sub">Shawarma</div>
+        <div class="header-role" id="user-role">Manager</div>
+    </div>
+    <div class="header-btns">
+        <button class="sync-btn" onclick="syncData()">Sync</button>
+        <button class="logout-btn" onclick="logout()">Exit</button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- DAILY PAGE -->
+<div class="page active" id="page-daily">
+    <div class="sec-title">Daily Entry</div>
+    <div class="sec-line"></div>
+    <div class="mode-toggle">
+        <button class="mode-btn active" id="mode-quick" onclick="switchMode('quick')">⚡ Quick</button>
+        <button class="mode-btn" id="mode-detailed" onclick="switchMode('detailed')">📋 Detailed</button>
+    </div>
+    <div id="quick-mode">
+        <div class="card-premium">
+            <div class="card-title">Date</div>
+            <div class="date-row">
+                <button class="arr-btn" onclick="changeDate('quick-date',-1); renderQuickList()">◀</button>
+                <input type="date" class="form-input" id="quick-date" onchange="renderQuickList()">
+                <button class="arr-btn" onclick="changeDate('quick-date',1); renderQuickList()">▶</button>
+            </div>
+        </div>
+        <div id="quick-list"></div>
+        <div class="status" id="quick-status"></div>
+        <button class="btn btn-gold" onclick="saveQuickEntries()">💾 Save All Entries</button>
+    </div>
+    <div id="detailed-mode" style="display:none">
+        <div class="card-premium">
+            <div class="card-title">Date & Customer</div>
+            <div class="date-row">
+                <button class="arr-btn" onclick="changeDate('entry-date',-1)">◀</button>
+                <input type="date" class="form-input" id="entry-date">
+                <button class="arr-btn" onclick="changeDate('entry-date',1)">▶</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Customer</label>
+                <select class="form-input" id="entry-customer" onchange="calcPreview()">
+                    <option value="">Select customer...</option>
+                </select>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">Quantities</div>
+            <div class="stats-grid">
+                <div class="form-group"><label class="form-label">Shawarma Small</label><input type="number" class="form-input" id="s-qty" placeholder="0" oninput="calcPreview()"></div>
+                <div class="form-group"><label class="form-label">Shawarma Large</label><input type="number" class="form-input" id="sl-qty" placeholder="0" oninput="calcPreview()"></div>
+                <div class="form-group"><label class="form-label">Burger</label><input type="number" class="form-input" id="b-qty" placeholder="0" oninput="calcPreview()"></div>
+                <div class="form-group"><label class="form-label">Butter Paper</label><input type="number" class="form-input" id="bp-qty" placeholder="0" oninput="calcPreview()"></div>
+                <div class="form-group"><label class="form-label">Mayonnaise</label><input type="number" class="form-input" id="m-qty" placeholder="0" oninput="calcPreview()"></div>
+                <div class="form-group"><label class="form-label">Rent</label><input type="number" class="form-input" id="rent" placeholder="0" oninput="calcPreview()"></div>
+                <div class="form-group owner-only" style="grid-column:span 2"><label class="form-label">Payment Received</label><input type="number" class="form-input" id="payment" placeholder="0" oninput="calcPreview()"></div>
+            </div>
+        </div>
+        <div class="card-premium">
+            <div class="card-title">Calculation</div>
+            <div class="stats-grid">
+                <div class="stat-box"><div class="stat-lbl">Shawarma Small</div><div class="stat-val" id="c-s">Rs 0</div></div>
+                <div class="stat-box"><div class="stat-lbl">Shawarma Large</div><div class="stat-val" id="c-sl">Rs 0</div></div>
+                <div class="stat-box"><div class="stat-lbl">Burger</div><div class="stat-val" id="c-b">Rs 0</div></div>
+                <div class="stat-box"><div class="stat-lbl">Butter Paper</div><div class="stat-val" id="c-bp">Rs 0</div></div>
+                <div class="stat-box"><div class="stat-lbl">Mayonnaise</div><div class="stat-val" id="c-m">Rs 0</div></div>
+                <div class="stat-box"><div class="stat-lbl">Rent</div><div class="stat-val" id="c-r">Rs 0</div></div>
+                <div class="stat-box highlight"><div class="stat-lbl">Day Total</div><div class="stat-val gold-val" id="c-dt">Rs 0</div></div>
+                <div class="stat-box owner-only"><div class="stat-lbl">Prev Outstanding</div><div class="stat-val" id="c-po">Rs 0</div></div>
+                <div class="stat-box full highlight owner-only"><div class="stat-lbl">New Outstanding</div><div class="stat-val gold-val" id="c-no">Rs 0</div></div>
+            </div>
+        </div>
+        <div class="status" id="daily-status"></div>
+        <button class="btn btn-gold" onclick="saveDailyEntry()">Save Entry</button>
+    </div>
+</div>
+
+<!-- CUSTOMERS PAGE -->
+<div class="page" id="page-customers">
+    <div class="sec-title">Customers</div>
+    <div class="sec-line"></div>
+    <div class="card-premium owner-only">
+        <div class="card-title" id="cust-form-title">Add Customer</div>
+        <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input" id="c-name" placeholder="Customer name"></div>
+        <div class="stats-grid">
+            <div class="form-group"><label class="form-label">Shawarma Small</label><input type="number" class="form-input" id="c-sr" placeholder="Rate"></div>
+            <div class="form-group"><label class="form-label">Shawarma Large</label><input type="number" class="form-input" id="c-slr" placeholder="Rate"></div>
+            <div class="form-group"><label class="form-label">Burger Rate</label><input type="number" class="form-input" id="c-br" placeholder="0"></div>
+            <div class="form-group"><label class="form-label">Butter Paper</label><input type="number" class="form-input" id="c-bpr" placeholder="0"></div>
+            <div class="form-group"><label class="form-label">Mayonnaise</label><input type="number" class="form-input" id="c-mr" placeholder="0"></div>
+            <div class="form-group"><label class="form-label">Opening Balance</label><input type="number" class="form-input" id="c-oo" placeholder="0"></div>
+        </div>
+        <button class="btn btn-gold" id="cust-save-btn" onclick="saveCustomer()">Save Customer</button>
+        <button class="btn btn-ghost" onclick="cancelCust()">Cancel</button>
+    </div>
+    <div class="card">
+        <div class="card-title">Customer List</div>
+        <div id="cust-list"><div class="empty">No customers added yet</div></div>
+    </div>
+</div>
+
+<!-- CUSTOMER HISTORY PAGE -->
+<div class="page" id="page-cust-history">
+    <button class="back-btn" onclick="showPage('customers')">← Back to Customers</button>
+    <div class="sec-title" id="ch-name">Customer</div>
+    <div class="sec-line"></div>
+    <div class="card-premium">
+        <div class="card-title">📅 Select Date Range</div>
+        <div class="form-group">
+            <label class="form-label">From Date</label>
+            <input type="date" class="form-input" id="ch-from">
+        </div>
+        <div class="form-group">
+            <label class="form-label">To Date</label>
+            <input type="date" class="form-input" id="ch-to">
+        </div>
+        <button class="btn btn-gold" onclick="renderCustomerHistory()">View History</button>
+    </div>
+    <div id="ch-content"></div>
+</div>
+
+<!-- OUTSTANDING PAGE -->
+<div class="page owner-only" id="page-outstanding">
+    <div class="sec-title">Outstanding</div>
+    <div class="sec-line"></div>
+    <button class="btn btn-outline" onclick="renderOutstanding()" style="margin-bottom:14px">Refresh</button>
+    <div class="card"><div id="out-list"><div class="empty">Loading...</div></div></div>
+</div>
+
+<!-- SUMMARY PAGE -->
+<div class="page" id="page-summary">
+    <div class="sec-title">Daily Summary</div>
+    <div class="sec-line"></div>
+    <div class="card-premium">
+        <div class="card-title">Select Date</div>
+        <div class="date-row">
+            <button class="arr-btn" onclick="changeDate('sum-date',-1)">◀</button>
+            <input type="date" class="form-input" id="sum-date">
+            <button class="arr-btn" onclick="changeDate('sum-date',1)">▶</button>
+        </div>
+        <button class="btn btn-gold" onclick="renderSummary()">View Summary</button>
+    </div>
+    <div id="sum-content"></div>
+</div>
+
+<!-- MONTHLY PAGE -->
+<div class="page" id="page-monthly">
+    <div class="sec-title">Monthly Report</div>
+    <div class="sec-line"></div>
+    <div class="card-premium">
+        <div class="card-title">Select Period</div>
+        <div class="stats-grid">
+            <div class="form-group"><label class="form-label">Year</label><input type="number" class="form-input" id="mon-year" placeholder="2026"></div>
+            <div class="form-group"><label class="form-label">Month</label>
+                <select class="form-input" id="mon-month">
+                    <option value="01">January</option><option value="02">February</option><option value="03">March</option><option value="04">April</option><option value="05">May</option><option value="06">June</option><option value="07">July</option><option value="08">August</option><option value="09">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-gold" onclick="renderMonthly()">Generate Report</button>
+    </div>
+    <div id="mon-content"></div>
+</div>
+
+<!-- HISTORY PAGE -->
+<div class="page" id="page-history">
+    <div class="sec-title">History</div>
+    <div class="sec-line"></div>
+    <div class="card-premium">
+        <div class="card-title">Select Date</div>
+        <div class="date-row">
+            <button class="arr-btn" onclick="changeDate('hist-date',-1)">◀</button>
+            <input type="date" class="form-input" id="hist-date">
+            <button class="arr-btn" onclick="changeDate('hist-date',1)">▶</button>
+        </div>
+        <button class="btn btn-gold" onclick="renderHistory()">View History</button>
+    </div>
+    <div id="hist-content"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+    <button class="nav-btn active" id="nav-daily" onclick="showPage('daily')">
+        <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        <span class="nav-label">Daily</span>
+    </button>
+    <button class="nav-btn" id="nav-customers" onclick="showPage('customers')">
+        <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/></svg>
+        <span class="nav-label">Customers</span>
+    </button>
+    <button class="nav-btn owner-only" id="nav-outstanding" onclick="showPage('outstanding')">
+        <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span class="nav-label">Balance</span>
+    </button>
+    <button class="nav-btn" id="nav-summary" onclick="showPage('summary')">
+        <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span class="nav-label">Summary</span>
+    </button>
+    <button class="nav-btn" id="nav-monthly" onclick="showPage('monthly')">
+        <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="nav-label">Monthly</span>
+    </button>
+    <button class="nav-btn" id="nav-history" onclick="showPage('history')">
+        <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+        <span class="nav-label">History</span>
+    </button>
+</div>
+
+<!-- HIDDEN BILL TEMPLATE FOR PDF -->
+<div id="bill-template" style="display:none;"></div>
+
+<script>
+let appData = { customers: {}, daily: {} };
+let editingCust = null;
+let userRole = null;
+let autoSyncInterval = null;
+let currentHistoryCustomer = null;
+const PASSWORDS = { '0000': 'manager', '9900': 'owner' };
+
+function loadLocal() {
+    try {
+        if (window.AndroidBridge) { const s = window.AndroidBridge.loadData(); if (s) appData = JSON.parse(s); }
+        else { const s = localStorage.getItem('mabakers'); if (s) appData = JSON.parse(s); }
+    } catch(e) { const s = localStorage.getItem('mabakers'); if (s) appData = JSON.parse(s); }
+}
+
+function saveLocal() {
+    try {
+        if (window.AndroidBridge) window.AndroidBridge.saveData(JSON.stringify(appData));
+        else localStorage.setItem('mabakers', JSON.stringify(appData));
+    } catch(e) { localStorage.setItem('mabakers', JSON.stringify(appData)); }
+}
+
+function today() { return new Date().toISOString().split('T')[0]; }
+function firstOfMonth() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-01'; }
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function showStatus(id, msg, cls) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = 'status show ' + cls;
+    setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    const navBtn = document.getElementById('nav-' + name);
+    if (navBtn) navBtn.classList.add('active');
+    if (name === 'outstanding') renderOutstanding();
+    if (name === 'daily') renderQuickList();
+}
+
+function changeDate(id, delta) {
+    const el = document.getElementById(id);
+    const d = new Date(el.value);
+    d.setDate(d.getDate() + delta);
+    el.value = d.toISOString().split('T')[0];
+    if (id === 'entry-date') calcPreview();
+}
+
+function switchMode(mode) {
+    document.getElementById('mode-quick').classList.toggle('active', mode === 'quick');
+    document.getElementById('mode-detailed').classList.toggle('active', mode === 'detailed');
+    document.getElementById('quick-mode').style.display = mode === 'quick' ? 'block' : 'none';
+    document.getElementById('detailed-mode').style.display = mode === 'detailed' ? 'block' : 'none';
+    if (mode === 'quick') renderQuickList();
+}
+
+function checkLogin() {
+    const pwd = document.getElementById('login-password').value;
+    if (PASSWORDS[pwd]) {
+        userRole = PASSWORDS[pwd];
+        localStorage.setItem('userRole', userRole);
+        applyRole();
+        document.getElementById('login-screen').classList.add('hidden');
+        startAutoSync();
+        renderQuickList();
+    } else {
+        document.getElementById('login-error').classList.add('show');
+        setTimeout(() => document.getElementById('login-error').classList.remove('show'), 2000);
+        document.getElementById('login-password').value = '';
+    }
+}
+
+function applyRole() {
+    if (userRole === 'manager') { document.body.classList.add('manager-mode'); document.getElementById('user-role').textContent = 'Manager'; }
+    else { document.body.classList.remove('manager-mode'); document.getElementById('user-role').textContent = 'Owner'; }
+}
+
+function logout() {
+    userRole = null;
+    localStorage.removeItem('userRole');
+    document.getElementById('login-password').value = '';
+    document.getElementById('login-screen').classList.remove('hidden');
+    stopAutoSync();
+    showToast('Logged out');
+}
+
+function startAutoSync() {
+    if (autoSyncInterval) clearInterval(autoSyncInterval);
+    autoSyncInterval = setInterval(() => syncDataSilent(), 5 * 60 * 1000);
+}
+
+function stopAutoSync() { if (autoSyncInterval) { clearInterval(autoSyncInterval); autoSyncInterval = null; } }
+
+async function syncDataSilent() {
+    try {
+        const res = await fetch('https://mabakers.bonto.run/api/sync', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(appData) });
+        if (res.ok) { appData = await res.json(); saveLocal(); renderAll(); }
+    } catch(e) {}
+}
+
+async function syncData() {
+    showToast('Syncing...');
+    try {
+        const res = await fetch('https://mabakers.bonto.run/api/sync', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(appData) });
+        if (res.ok) { appData = await res.json(); saveLocal(); renderAll(); showToast('✓ Synced successfully'); }
+        else showToast('Sync failed');
+    } catch(e) { showToast('No internet connection'); }
+}
+
+function renderQuickList() {
+    const date = document.getElementById('quick-date').value;
+    const list = document.getElementById('quick-list');
+    const names = Object.keys(appData.customers);
+    if (!names.length) { list.innerHTML = '<div class="empty">Add customers first</div>'; return; }
+    const existing = appData.daily[date] || {};
+    list.innerHTML = names.map(name => {
+        const c = appData.customers[name];
+        const e = existing[name] || {};
+        const showSmall = (c.shawarma_small_rate || c.shawarma_rate || 0) > 0;
+        const showLarge = (c.shawarma_large_rate || 0) > 0;
+        const showBurger = (c.burger_rate || 0) > 0;
+        const showButter = (c.butter_rate || 0) > 0;
+        const showMayo = (c.mayo_rate || 0) > 0;
+        let fields = '';
+        if (showSmall) fields += `<div class="quick-field"><div class="quick-label">Small</div><input type="number" class="quick-input" data-name="${name}" data-field="s" value="${e.shawarma_small_qty || e.shawarma_qty || ''}" placeholder="0"></div>`;
+        if (showLarge) fields += `<div class="quick-field"><div class="quick-label">Large</div><input type="number" class="quick-input" data-name="${name}" data-field="sl" value="${e.shawarma_large_qty || ''}" placeholder="0"></div>`;
+        if (showBurger) fields += `<div class="quick-field"><div class="quick-label">Burger</div><input type="number" class="quick-input" data-name="${name}" data-field="b" value="${e.burger_qty || ''}" placeholder="0"></div>`;
+        if (showButter) fields += `<div class="quick-field"><div class="quick-label">Butter</div><input type="number" class="quick-input" data-name="${name}" data-field="bp" value="${e.butter_qty || ''}" placeholder="0"></div>`;
+        if (showMayo) fields += `<div class="quick-field"><div class="quick-label">Mayo</div><input type="number" class="quick-input" data-name="${name}" data-field="m" value="${e.mayo_qty || ''}" placeholder="0"></div>`;
+        fields += `<div class="quick-field"><div class="quick-label">Rent</div><input type="number" class="quick-input" data-name="${name}" data-field="rent" value="${e.rent || ''}" placeholder="0"></div>`;
+        if (userRole === 'owner') {
+            fields += `<div class="quick-field"><div class="quick-label">💵 Payment</div><input type="number" class="quick-input" data-name="${name}" data-field="payment" value="${e.payment || ''}" placeholder="0" style="color:var(--green)"></div>`;
+        }
+        const hasData = Object.keys(e).length > 0;
+        return `<div class="quick-cust ${hasData ? 'has-data' : ''}">
+            <div class="quick-name">${name}</div>
+            <div class="quick-grid">${fields}</div>
+        </div>`;
+    }).join('');
+}
+
+function saveQuickEntries() {
+    const date = document.getElementById('quick-date').value;
+    const inputs = document.querySelectorAll('.quick-input');
+    const byCustomer = {};
+    inputs.forEach(inp => {
+        const name = inp.dataset.name;
+        const field = inp.dataset.field;
+        const val = parseFloat(inp.value || 0);
+        if (!byCustomer[name]) byCustomer[name] = {};
+        byCustomer[name][field] = val;
+    });
+    if (!appData.daily[date]) appData.daily[date] = {};
+    let savedCount = 0;
+    for (const name in byCustomer) {
+        const d = byCustomer[name];
+        const totalQty = (d.s || 0) + (d.sl || 0) + (d.b || 0) + (d.bp || 0) + (d.m || 0);
+        const hasPayment = (d.payment || 0) > 0;
+        const hasRent = (d.rent || 0) > 0;
+        if (totalQty === 0 && !hasPayment && !hasRent) {
+            if (appData.daily[date][name]) delete appData.daily[date][name];
+            continue;
+        }
+        const c = appData.customers[name];
+        const sr = c.shawarma_small_rate || c.shawarma_rate || 0;
+        const slr = c.shawarma_large_rate || 0;
+        const sT = (d.s || 0) * sr;
+        const slT = (d.sl || 0) * slr;
+        const bT = (d.b || 0) * (c.burger_rate || 0);
+        const bpT = (d.bp || 0) * (c.butter_rate || 0);
+        const mT = (d.m || 0) * (c.mayo_rate || 0);
+        const dt = sT + slT + bT + bpT + mT + (d.rent || 0);
+        const po = getPrevOut(name, date);
+        let p = d.payment || 0;
+        if (userRole === 'manager' && appData.daily[date][name]) p = appData.daily[date][name].payment || 0;
+        const no = po + dt - p;
+        appData.daily[date][name] = {
+            shawarma_small_qty: d.s || 0, shawarma_small_rate: sr, shawarma_small_total: sT,
+            shawarma_large_qty: d.sl || 0, shawarma_large_rate: slr, shawarma_large_total: slT,
+            burger_qty: d.b || 0, burger_rate: c.burger_rate || 0, burger_total: bT,
+            butter_qty: d.bp || 0, butter_rate: c.butter_rate || 0, butter_total: bpT,
+            mayo_qty: d.m || 0, mayo_rate: c.mayo_rate || 0, mayo_total: mT,
+            rent: d.rent || 0, day_total: dt, payment: p, prev_outstanding: po, outstanding: no
+        };
+        savedCount++;
+    }
+    saveLocal();
+    if (savedCount > 0) showStatus('quick-status', `✓ ${savedCount} entries saved`, 'success');
+    else showStatus('quick-status', 'No entries to save', 'warning');
+    renderQuickList();
+}
+
+function renderCustomers() {
+    const names = Object.keys(appData.customers);
+    const list = document.getElementById('cust-list');
+    if (!names.length) { list.innerHTML = '<div class="empty">No customers added yet</div>'; return; }
+    list.innerHTML = names.map(n => {
+        const c = appData.customers[n];
+        const sr = c.shawarma_small_rate || c.shawarma_rate || 0;
+        const slr = c.shawarma_large_rate || 0;
+        const ownerBtns = userRole === 'owner' ? `<button class="icon-btn" onclick="editCust('${n}')">✏️</button><button class="icon-btn" style="color:#C94C4C;border-color:rgba(201,76,76,0.2)" onclick="deleteCust('${n}')">🗑️</button>` : '';
+        return `<div class="row"><div><div class="row-name">${n}</div><div class="row-sub">Small Rs ${sr} · Large ${slr ? 'Rs '+slr : '—'} · Burger ${c.burger_rate ? 'Rs '+c.burger_rate : '—'}</div><div class="row-sub">Butter ${c.butter_rate ? 'Rs '+c.butter_rate : '—'} · Mayo ${c.mayo_rate ? 'Rs '+c.mayo_rate : '—'}</div></div><div class="flex-btns"><button class="icon-btn" onclick="openCustHistory('${n}')">👁</button>${ownerBtns}</div></div>`;
+    }).join('');
+    const sel = document.getElementById('entry-customer');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">Select customer...</option>' + names.map(n => `<option value="${n}"${n===cur?' selected':''}>${n}</option>`).join('');
+}
+
+function openCustHistory(name) {
+    currentHistoryCustomer = name;
+    document.getElementById('ch-name').textContent = name;
+    document.getElementById('ch-from').value = firstOfMonth();
+    document.getElementById('ch-to').value = today();
+    document.getElementById('ch-content').innerHTML = '';
+    showPage('cust-history');
+    renderCustomerHistory();
+}
+
+function generateBill(name, from, to) {
+    const daily = appData.daily;
+    const dates = Object.keys(daily).filter(d => daily[d][name] && d >= from && d <= to).sort();
+    
+    if (!dates.length) {
+        showToast('No entries to generate bill');
+        return;
+    }
+
+    // Get products used in this period
+    const productsUsed = new Set();
+    dates.forEach(d => {
+        const e = daily[d][name];
+        if ((e.shawarma_small_qty || e.shawarma_qty || 0) > 0) productsUsed.add('small');
+        if ((e.shawarma_large_qty || 0) > 0) productsUsed.add('large');
+        if ((e.burger_qty || 0) > 0) productsUsed.add('burger');
+        if ((e.butter_qty || 0) > 0) productsUsed.add('butter');
+        if ((e.mayo_qty || 0) > 0) productsUsed.add('mayo');
+        if ((e.rent || 0) > 0) productsUsed.add('rent');
+    });
+
+    // Build table header
+    let headers = '<th class="left">Date</th>';
+    if (productsUsed.has('small')) headers += '<th>Small</th>';
+    if (productsUsed.has('large')) headers += '<th>Large</th>';
+    if (productsUsed.has('burger')) headers += '<th>Burger</th>';
+    if (productsUsed.has('butter')) headers += '<th>Butter</th>';
+    if (productsUsed.has('mayo')) headers += '<th>Mayo</th>';
+    if (productsUsed.has('rent')) headers += '<th>Rent</th>';
+    headers += '<th>Day Total</th>';
+
+    // Build table rows
+    let rows = '';
+    let totals = { small: 0, large: 0, burger: 0, butter: 0, mayo: 0, rent: 0, grandTotal: 0 };
+
+    dates.reverse().forEach(d => {
+        const e = daily[d][name];
+        const smallQty = e.shawarma_small_qty || e.shawarma_qty || 0;
+        const largeQty = e.shawarma_large_qty || 0;
+        const burgerQty = e.burger_qty || 0;
+        const butterQty = e.butter_qty || 0;
+        const mayoQty = e.mayo_qty || 0;
+        const rentAmt = e.rent || 0;
+
+        rows += `<tr><td class="left">${d}</td>`;
+        if (productsUsed.has('small')) { rows += `<td>${smallQty}</td>`; totals.small += smallQty; }
+        if (productsUsed.has('large')) { rows += `<td>${largeQty}</td>`; totals.large += largeQty; }
+        if (productsUsed.has('burger')) { rows += `<td>${burgerQty}</td>`; totals.burger += burgerQty; }
+        if (productsUsed.has('butter')) { rows += `<td>${butterQty}</td>`; totals.butter += butterQty; }
+        if (productsUsed.has('mayo')) { rows += `<td>${mayoQty}</td>`; totals.mayo += mayoQty; }
+        if (productsUsed.has('rent')) { rows += `<td>${rentAmt.toFixed(0)}</td>`; totals.rent += rentAmt; }
+        rows += `<td class="right">${(e.day_total || 0).toFixed(0)}</td></tr>`;
+        totals.grandTotal += e.day_total || 0;
+    });
+
+    // Build summary
+    let summary = '';
+    if (productsUsed.has('small')) summary += `<div class="bill-summary-row"><span>Total Shawarma Small:</span><span>${totals.small} pcs</span></div>`;
+    if (productsUsed.has('large')) summary += `<div class="bill-summary-row"><span>Total Shawarma Large:</span><span>${totals.large} pcs</span></div>`;
+    if (productsUsed.has('burger')) summary += `<div class="bill-summary-row"><span>Total Burger:</span><span>${totals.burger} pcs</span></div>`;
+    if (productsUsed.has('butter')) summary += `<div class="bill-summary-row"><span>Total Butter Paper:</span><span>${totals.butter} pcs</span></div>`;
+    if (productsUsed.has('mayo')) summary += `<div class="bill-summary-row"><span>Total Mayonnaise:</span><span>${totals.mayo} pcs</span></div>`;
+    if (productsUsed.has('rent')) summary += `<div class="bill-summary-row"><span>Total Rent:</span><span>Rs ${totals.rent.toFixed(0)}</span></div>`;
+
+    // Get outstanding
+    const lastDate = dates[dates.length - 1];
+    const lastEntry = daily[lastDate][name];
+    const outstanding = lastEntry.outstanding || 0;
+    const prevOut = lastEntry.prev_outstanding || 0;
+    const paid = lastEntry.payment || 0;
+
+    const billHTML = `
+        <div class="bill-container">
+            <div class="bill-header">
+                <div class="bill-title">M.A BAKERS</div>
+                <div class="bill-subtitle">SHAWARMA</div>
+            </div>
+            
+            <div class="bill-info">
+                <div><strong>M/s:</strong> ${name}</div>
+                <div><strong>S.No:</strong> ${Math.floor(Math.random() * 1000)}</div>
+            </div>
+            
+            <div class="bill-info">
+                <div colspan="2"><strong>Period:</strong> ${from} to ${to}</div>
+            </div>
+
+            <table class="bill-table">
+                <thead><tr>${headers}</tr></thead>
+                <tbody>${rows}</tbody>
+            </table>
+
+            <div class="bill-summary">
+                <strong>SUMMARY</strong>
+                ${summary}
+            </div>
+
+            <div class="bill-summary">
+                <div class="bill-summary-row bill-total"><span>Total Business Amount:</span><span>Rs ${totals.grandTotal.toFixed(0)}</span></div>
+                ${userRole === 'owner' ? `
+                    <div class="bill-summary-row"><span>Previous Outstanding:</span><span>Rs ${prevOut.toFixed(0)}</span></div>
+                    <div class="bill-summary-row"><span>Total Paid:</span><span>Rs ${paid.toFixed(0)}</span></div>
+                    <div class="bill-summary-row bill-total" style="color: ${outstanding <= 0 ? 'green' : 'red'}"><span>Current Outstanding:</span><span>${outstanding <= 0 ? 'PAID' : 'Rs ' + outstanding.toFixed(0)}</span></div>
+                ` : ''}
+            </div>
+
+            <div class="bill-footer">
+                <p>Generated on ${new Date().toLocaleString()}</p>
+                <p style="margin-top: 20px;">_________________________</p>
+                <p>Signature</p>
+            </div>
+        </div>
+    `;
+
+    const element = document.createElement('div');
+    element.innerHTML = billHTML;
+    const opt = {
+        margin: 5,
+        filename: `${name}_Bill_${from}_to_${to}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+    };
+    html2pdf().set(opt).from(element).save();
+    showToast('Bill downloaded');
+}
+
+function renderCustomerHistory() {
+    const name = currentHistoryCustomer;
+    if (!name) return;
+    const from = document.getElementById('ch-from').value;
+    const to = document.getElementById('ch-to').value;
+    const content = document.getElementById('ch-content');
+    const daily = appData.daily;
+    const dates = Object.keys(daily).filter(d => daily[d][name] && d >= from && d <= to).sort();
+    if (!dates.length) {
+        content.innerHTML = '<div class="empty">No entries found in this period</div>';
+        return;
+    }
+    let totalSS=0, totalSL=0, totalB=0, totalBP=0, totalM=0, totalR=0, totalP=0;
+    let totalSSqty=0, totalSLqty=0, totalBqty=0, totalBPqty=0, totalMqty=0;
+    const rows = dates.reverse().map(d => {
+        const e = daily[d][name];
+        const ssQty = e.shawarma_small_qty || e.shawarma_qty || 0;
+        const slQty = e.shawarma_large_qty || 0;
+        const bQty = e.burger_qty || 0;
+        const bpQty = e.butter_qty || 0;
+        const mQty = e.mayo_qty || 0;
+        totalSS += e.shawarma_small_total || e.shawarma_total || 0;
+        totalSL += e.shawarma_large_total || 0;
+        totalB += e.burger_total || 0;
+        totalBP += e.butter_total || 0;
+        totalM += e.mayo_total || 0;
+        totalR += e.rent || 0;
+        totalP += e.payment || 0;
+        totalSSqty += ssQty; totalSLqty += slQty;
+        totalBqty += bQty; totalBPqty += bpQty; totalMqty += mQty;
+        let details = '';
+        if (ssQty) details += `<div class="row-sub">🫓 Small: ${ssQty} × Rs ${e.shawarma_small_rate || e.shawarma_rate || 0} = Rs ${(e.shawarma_small_total || e.shawarma_total || 0).toFixed(0)}</div>`;
+        if (slQty) details += `<div class="row-sub">🫓 Large: ${slQty} × Rs ${e.shawarma_large_rate || 0} = Rs ${(e.shawarma_large_total || 0).toFixed(0)}</div>`;
+        if (bQty) details += `<div class="row-sub">🍔 Burger: ${bQty} × Rs ${e.burger_rate || 0} = Rs ${(e.burger_total || 0).toFixed(0)}</div>`;
+        if (bpQty) details += `<div class="row-sub">🧻 Butter: ${bpQty} × Rs ${e.butter_rate || 0} = Rs ${(e.butter_total || 0).toFixed(0)}</div>`;
+        if (mQty) details += `<div class="row-sub">🥫 Mayo: ${mQty} × Rs ${e.mayo_rate || 0} = Rs ${(e.mayo_total || 0).toFixed(0)}</div>`;
+        if (e.rent) details += `<div class="row-sub">🏠 Rent: Rs ${(e.rent || 0).toFixed(0)}</div>`;
+        const ownerDetails = userRole === 'owner' ? `
+            <div class="row-sub" style="color:var(--green)">💵 Payment Received: Rs ${(e.payment || 0).toFixed(0)}</div>
+            <div class="row-sub">Prev Balance: Rs ${(e.prev_outstanding || 0).toFixed(0)}</div>
+            <div class="row-sub" style="color:${(e.outstanding||0)<=0?'var(--green)':'var(--gold-light)'}">Outstanding: ${(e.outstanding||0)<=0?'PAID':'Rs '+(e.outstanding||0).toFixed(0)}</div>
+        ` : '';
+        return `<div class="entry-card">
+            <div class="entry-date">${d}</div>
+            ${details}
+            <div class="row-sub" style="color:var(--gold-light);font-weight:600;margin-top:6px">Day Total: Rs ${(e.day_total || 0).toFixed(0)}</div>
+            ${ownerDetails}
+        </div>`;
+    }).join('');
+    const totalRev = totalSS + totalSL + totalB + totalBP + totalM + totalR;
+    let lastOut = 0;
+    if (userRole === 'owner') {
+        const lastDate = Object.keys(daily).filter(d => daily[d][name]).sort().pop();
+        if (lastDate) lastOut = daily[lastDate][name].outstanding || 0;
+    }
+    const ownerSummary = userRole === 'owner' ? `
+        <div class="stat-box"><div class="stat-lbl">Total Paid</div><div class="stat-val green-val">Rs ${totalP.toFixed(0)}</div></div>
+        <div class="stat-box full highlight"><div class="stat-lbl">Current Outstanding</div><div class="stat-val ${lastOut<=0?'green-val':'gold-val'}">${lastOut<=0?'PAID':'Rs '+lastOut.toFixed(0)}</div></div>
+    ` : '';
+    content.innerHTML = `
+        <div class="card-premium">
+            <div class="hero-stat">
+                <div class="hero-label">Total Business</div>
+                <div class="hero-value">Rs ${totalRev.toFixed(0)}</div>
+            </div>
+            <div class="gold-divider"></div>
+            <div class="stats-grid">
+                <div class="stat-box"><div class="stat-lbl">Shawarma Small</div><div class="stat-val">${totalSSqty} pcs<br>Rs ${totalSS.toFixed(0)}</div></div>
+                <div class="stat-box"><div class="stat-lbl">Shawarma Large</div><div class="stat-val">${totalSLqty} pcs<br>Rs ${totalSL.toFixed(0)}</div></div>
+                <div class="stat-box"><div class="stat-lbl">Burger</div><div class="stat-val">${totalBqty} pcs<br>Rs ${totalB.toFixed(0)}</div></div>
+                <div class="stat-box"><div class="stat-lbl">Butter Paper</div><div class="stat-val">${totalBPqty} pcs<br>Rs ${totalBP.toFixed(0)}</div></div>
+                <div class="stat-box"><div class="stat-lbl">Mayonnaise</div><div class="stat-val">${totalMqty} pcs<br>Rs ${totalM.toFixed(0)}</div></div>
+                <div class="stat-box"><div class="stat-lbl">Total Rent</div><div class="stat-val">Rs ${totalR.toFixed(0)}</div></div>
+                ${ownerSummary}
+            </div>
+            <button class="btn btn-gold" style="margin-top:14px" onclick="generateBill('${name}', '${document.getElementById('ch-from').value}', '${document.getElementById('ch-to').value}')">📄 Print Bill (PDF)</button>
+        </div>
+        <div class="card-title">📋 Daily Entries (${dates.length} days)</div>
+        ${rows}
+    `;
+}
+
+function saveCustomer() {
+    const name = document.getElementById('c-name').value.trim();
+    const sr = parseFloat(document.getElementById('c-sr').value || 0);
+    const slr = parseFloat(document.getElementById('c-slr').value || 0);
+    const br = parseFloat(document.getElementById('c-br').value || 0);
+    const bpr = parseFloat(document.getElementById('c-bpr').value || 0);
+    const mr = parseFloat(document.getElementById('c-mr').value || 0);
+    const oo = parseFloat(document.getElementById('c-oo').value || 0);
+    if (!name || !sr) { showToast('Enter name and shawarma rate'); return; }
+    if (editingCust && editingCust !== name) delete appData.customers[editingCust];
+    appData.customers[name] = { shawarma_small_rate: sr, shawarma_large_rate: slr, burger_rate: br, butter_rate: bpr, mayo_rate: mr, opening_outstanding: oo };
+    saveLocal();
+    cancelCust();
+    renderCustomers();
+    renderQuickList();
+    showToast('Customer saved');
+}
+
+function editCust(name) {
+    const c = appData.customers[name];
+    editingCust = name;
+    document.getElementById('c-name').value = name;
+    document.getElementById('c-sr').value = c.shawarma_small_rate || c.shawarma_rate || '';
+    document.getElementById('c-slr').value = c.shawarma_large_rate || '';
+    document.getElementById('c-br').value = c.burger_rate || '';
+    document.getElementById('c-bpr').value = c.butter_rate || '';
+    document.getElementById('c-mr').value = c.mayo_rate || '';
+    document.getElementById('c-oo').value = c.opening_outstanding || '';
+    document.getElementById('cust-form-title').textContent = 'Edit Customer';
+    document.getElementById('cust-save-btn').textContent = 'Update Customer';
+    showPage('customers');
+    window.scrollTo(0, 0);
+}
+
+function cancelCust() {
+    editingCust = null;
+    ['c-name','c-sr','c-slr','c-br','c-bpr','c-mr','c-oo'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('cust-form-title').textContent = 'Add Customer';
+    document.getElementById('cust-save-btn').textContent = 'Save Customer';
+}
+
+function deleteCust(name) {
+    delete appData.customers[name];
+    saveLocal();
+    renderCustomers();
+    renderQuickList();
+    showToast('Deleted ' + name);
+}
+
+function getPrevOut(name, date) {
+    const dates = Object.keys(appData.daily).filter(d => appData.daily[d][name] && d < date).sort();
+    if (dates.length) return appData.daily[dates[dates.length-1]][name].outstanding || 0;
+    return appData.customers[name] ? appData.customers[name].opening_outstanding || 0 : 0;
+}
+
+function calcPreview() {
+    const name = document.getElementById('entry-customer').value;
+    const date = document.getElementById('entry-date').value;
+    if (!name || !appData.customers[name]) return;
+    const c = appData.customers[name];
+    const sr = c.shawarma_small_rate || c.shawarma_rate || 0;
+    const slr = c.shawarma_large_rate || 0;
+    const sQ = parseFloat(document.getElementById('s-qty').value || 0);
+    const slQ = parseFloat(document.getElementById('sl-qty').value || 0);
+    const bQ = parseFloat(document.getElementById('b-qty').value || 0);
+    const bpQ = parseFloat(document.getElementById('bp-qty').value || 0);
+    const mQ = parseFloat(document.getElementById('m-qty').value || 0);
+    const r = parseFloat(document.getElementById('rent').value || 0);
+    const pEl = document.getElementById('payment');
+    const p = pEl ? parseFloat(pEl.value || 0) : 0;
+    const sT=sQ*sr, slT=slQ*slr, bT=bQ*(c.burger_rate||0), bpT=bpQ*(c.butter_rate||0), mT=mQ*(c.mayo_rate||0);
+    const dt=sT+slT+bT+bpT+mT+r;
+    const po=getPrevOut(name,date);
+    const no=po+dt-p;
+    document.getElementById('c-s').textContent='Rs '+sT.toFixed(0);
+    document.getElementById('c-sl').textContent='Rs '+slT.toFixed(0);
+    document.getElementById('c-b').textContent='Rs '+bT.toFixed(0);
+    document.getElementById('c-bp').textContent='Rs '+bpT.toFixed(0);
+    document.getElementById('c-m').textContent='Rs '+mT.toFixed(0);
+    document.getElementById('c-r').textContent='Rs '+r.toFixed(0);
+    document.getElementById('c-dt').textContent='Rs '+dt.toFixed(0);
+    document.getElementById('c-po').textContent='Rs '+po.toFixed(0);
+    const noEl=document.getElementById('c-no');
+    noEl.textContent='Rs '+no.toFixed(0);
+    noEl.className='stat-val '+(no<=0?'green-val':'gold-val');
+}
+
+function saveDailyEntry() {
+    const name = document.getElementById('entry-customer').value;
+    const date = document.getElementById('entry-date').value;
+    if (!name || !appData.customers[name]) { showToast('Select a customer'); return; }
+    const c = appData.customers[name];
+    const sr = c.shawarma_small_rate||c.shawarma_rate||0;
+    const slr = c.shawarma_large_rate||0;
+    const sQ=parseFloat(document.getElementById('s-qty').value||0);
+    const slQ=parseFloat(document.getElementById('sl-qty').value||0);
+    const bQ=parseFloat(document.getElementById('b-qty').value||0);
+    const bpQ=parseFloat(document.getElementById('bp-qty').value||0);
+    const mQ=parseFloat(document.getElementById('m-qty').value||0);
+    const r=parseFloat(document.getElementById('rent').value||0);
+    const pEl=document.getElementById('payment');
+    let p=0;
+    if (userRole==='owner' && pEl) p=parseFloat(pEl.value||0);
+    else if (appData.daily[date] && appData.daily[date][name]) p=appData.daily[date][name].payment||0;
+    const sT=sQ*sr,slT=slQ*slr,bT=bQ*(c.burger_rate||0),bpT=bpQ*(c.butter_rate||0),mT=mQ*(c.mayo_rate||0);
+    const dt=sT+slT+bT+bpT+mT+r;
+    const po=getPrevOut(name,date);
+    const no=po+dt-p;
+    if(!appData.daily[date]) appData.daily[date]={};
+    appData.daily[date][name]={
+        shawarma_small_qty:sQ,shawarma_small_rate:sr,shawarma_small_total:sT,
+        shawarma_large_qty:slQ,shawarma_large_rate:slr,shawarma_large_total:slT,
+        burger_qty:bQ,burger_rate:c.burger_rate||0,burger_total:bT,
+        butter_qty:bpQ,butter_rate:c.butter_rate||0,butter_total:bpT,
+        mayo_qty:mQ,mayo_rate:c.mayo_rate||0,mayo_total:mT,
+        rent:r,day_total:dt,payment:p,prev_outstanding:po,outstanding:no
+    };
+    saveLocal();
+    if (userRole === 'owner') showStatus('daily-status','Entry saved · Outstanding Rs '+no.toFixed(0),no<=0?'success':'warning');
+    else showStatus('daily-status','Entry saved successfully','success');
+    ['s-qty','sl-qty','b-qty','bp-qty','m-qty','rent'].forEach(id=>document.getElementById(id).value='');
+    if (pEl) pEl.value='';
+    calcPreview();
+}
+
+function renderOutstanding() {
+    const daily=appData.daily;
+    const items=[];
+    for(const name in appData.customers){
+        const dates=Object.keys(daily).filter(d=>daily[d][name]).sort();
+        if(dates.length){
+            const amt=daily[dates[dates.length-1]][name].outstanding||0;
+            if(amt>0) items.push({name,date:dates[dates.length-1],amt});
+        } else {
+            const op=appData.customers[name].opening_outstanding||0;
+            if(op>0) items.push({name,date:'No entries',amt:op});
+        }
+    }
+    const list=document.getElementById('out-list');
+    if(!items.length){ list.innerHTML='<div style="text-align:center;padding:32px;color:var(--green);font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:600">All Accounts Clear</div>'; return; }
+    list.innerHTML=items.map(i=>`<div class="row"><div><div class="row-name">${i.name}</div><div class="row-sub">${i.date}</div></div><span class="badge-out">Rs ${i.amt.toFixed(0)}</span></div>`).join('');
+}
+
+function renderSummary() {
+    const date=document.getElementById('sum-date').value;
+    const entries=appData.daily[date];
+    const content=document.getElementById('sum-content');
+    if(!entries||!Object.keys(entries).length){showToast('No entries for this date');content.innerHTML='';return;}
+    let ts=0,tsl=0,tb=0,tbp=0,tm=0,tr=0,tp=0,to=0;
+    const rows=Object.entries(entries).map(([name,e])=>{
+        ts+=e.shawarma_small_total||e.shawarma_total||0;
+        tsl+=e.shawarma_large_total||0;
+        tb+=e.burger_total||0;tbp+=e.butter_total||0;
+        tm+=e.mayo_total||0;tr+=e.rent||0;tp+=e.payment||0;
+        const out=e.outstanding||0;to+=Math.max(out,0);
+        const badge=userRole==='owner'?`<span class="${out<=0?'badge-paid':'badge-out'}">${out<=0?'Paid':'Rs '+out.toFixed(0)}</span>`:'';
+        return `<div class="row"><div><div class="row-name">${name}</div><div class="row-sub">Small Rs ${(e.shawarma_small_total||e.shawarma_total||0).toFixed(0)} · Large Rs ${(e.shawarma_large_total||0).toFixed(0)}</div><div class="row-sub">Rent Rs ${(e.rent||0).toFixed(0)}</div></div>${badge}</div>`;
+    }).join('');
+    const totalDay=ts+tsl+tb+tbp+tm+tr;
+    const outHTML=userRole==='owner'?`<div class="stat-box"><div class="stat-lbl">Payment</div><div class="stat-val green-val">Rs ${tp.toFixed(0)}</div></div><div class="stat-box full highlight"><div class="stat-lbl">Total Outstanding</div><div class="stat-val gold-val">Rs ${to.toFixed(0)}</div></div>`:'';
+    content.innerHTML=`<div class="card-premium"><div class="hero-stat"><div class="hero-label">Total Revenue</div><div class="hero-value">Rs ${totalDay.toFixed(0)}</div></div><div class="gold-divider"></div><div class="stats-grid"><div class="stat-box"><div class="stat-lbl">Shawarma Small</div><div class="stat-val">Rs ${ts.toFixed(0)}</div></div><div class="stat-box"><div class="stat-lbl">Shawarma Large</div><div class="stat-val">Rs ${tsl.toFixed(0)}</div></div><div class="stat-box"><div class="stat-lbl">Burger</div><div class="stat-val">Rs ${tb.toFixed(0)}</div></div><div class="stat-box"><div class="stat-lbl">Butter Paper</div><div class="stat-val">Rs ${tbp.toFixed(0)}</div></div><div class="stat-box"><div class="stat-lbl">Mayonnaise</div><div class="stat-val">Rs ${tm.toFixed(0)}</div></div><div class="stat-box"><div class="stat-lbl">Rent</div><div class="stat-val">Rs ${tr.toFixed(0)}</div></div>${outHTML}</div></div><div class="card">${rows}</div>`;
+}
+
+function renderMonthly() {
+    const year=document.getElementById('mon-year').value;
+    const month=document.getElementById('mon-month').value;
+    const prefix=year+'-'+month;
+    const daily=appData.daily;
+    const content=document.getElementById('mon-content');
+    const monthDates=Object.keys(daily).filter(d=>d.startsWith(prefix)).sort();
+    if(!monthDates.length){showToast('No data for this month');content.innerHTML='';return;}
+    const totals={};
+    for(const d of monthDates){
+        for(const[name,e] of Object.entries(daily[d])){
+            if(!totals[name]) totals[name]={ss:0,sl:0,b:0,bp:0,m:0,rent:0,pay:0};
+            totals[name].ss+=e.shawarma_small_total||e.shawarma_total||0;
+            totals[name].sl+=e.shawarma_large_total||0;
+            totals[name].b+=e.burger_total||0;totals[name].bp+=e.butter_total||0;
+            totals[name].m+=e.mayo_total||0;totals[name].rent+=e.rent||0;totals[name].pay+=e.payment||0;
+        }
+    }
+    let ts=0,tsl=0,tb=0,tbp=0,tm=0,tr=0,tp=0,to=0;
+    const rows=Object.entries(totals).map(([name,t])=>{
+        ts+=t.ss;tsl+=t.sl;tb+=t.b;tbp+=t.bp;tm+=t.m;tr+=t.rent;tp+=t.pay;
+        const ld=Object.keys(daily).filter(d=>daily[d][name]&&d.startsWith(prefix)).sort();
+        let out=0;
+        if(ld.length) out=daily[ld[ld.length-1]][name].outstanding||0;
+        if(out>0) to+=out;
+        const badge=userRole==='owner'?`<span class="${out<=0?'badge-paid':'badge-out'}">${out<=0?'Paid':'Rs '+out.toFixed(0)}</span>`:'';
+        return `<div class="row"><div><div class="row-name">${name}</div><div class="row-sub">Small Rs ${t.ss.toFixed(0)} · Large Rs ${t.sl.toFixed(0)}</div><div class="row-sub">Rent Rs ${t.rent.toFixed(0)}</div></div>${badge}</div>`;
+    }).join('');
+    const totalRev=ts+tsl+tb+tbp+tm+tr;
+    const outHTML=userRole==='owner'?`<div class="stat-box"><div class="stat-lbl">Payment</div><div class="stat-val green-val">Rs ${tp.toFixed(0)}</div></div><div class="stat-box full highlight"><div class="stat-lbl">Total Outstanding</div><div class="stat-val gold-val">Rs ${to.toFixed(0)}</div></div>`:'';
+    content.innerHTML=`<div class="card-premium"><div class="hero-stat"><div class="hero-label">Monthly Revenue</div><div class="hero-value">Rs ${totalRev.toFixed(0)}</div></div><div class="gold-divider"></div><div class="stats-grid"><div class="stat-box"><div class="stat-lbl">Shawarma Small</div><div class="stat-val">Rs ${ts.toFixed(0)}</div></div><div class="stat-box"><div class="stat-lbl">Shawarma Large</div><div class="stat-val">Rs ${tsl.toFixed(0)}</div></div><div class="stat-box"><div class="stat-lbl">Burger</div><div class="stat-val">Rs ${tb.toFixed(0)}</div></div><div class="stat-box"><div class="stat-lbl">Butter Paper</div><div class="stat-val">Rs ${tbp.toFixed(0)}</div></div><div class="stat-box"><div class="stat-lbl">Rent</div><div class="stat-val">Rs ${tr.toFixed(0)}</div></div>${outHTML}</div></div><div class="card">${rows}</div>`;
+}
+
+function renderHistory() {
+    const date=document.getElementById('hist-date').value;
+    const entries=appData.daily[date];
+    const content=document.getElementById('hist-content');
+    if(!entries||!Object.keys(entries).length){showToast('No entries for this date');content.innerHTML='';return;}
+    const rows=Object.entries(entries).map(([name,e])=>{
+        const out=e.outstanding||0;
+        const badge=userRole==='owner'?`<span class="${out<=0?'badge-paid':'badge-out'}">${out<=0?'Paid':'Rs '+out.toFixed(0)}</span>`:'';
+        const paymentInfo=userRole==='owner'?`<div class="row-sub">Prev Balance Rs ${(e.prev_outstanding||0).toFixed(0)} · Paid Rs ${(e.payment||0).toFixed(0)}</div>`:'';
+        return `<div class="row"><div><div class="row-name">${name}</div><div class="row-sub">Small Rs ${(e.shawarma_small_total||e.shawarma_total||0).toFixed(0)} · Large Rs ${(e.shawarma_large_total||0).toFixed(0)}</div><div class="row-sub">Burger Rs ${(e.burger_total||0).toFixed(0)} · Rent Rs ${(e.rent||0).toFixed(0)}</div>${paymentInfo}</div>${badge}</div>`;
+    }).join('');
+    content.innerHTML='<div class="card">'+rows+'</div>';
+}
+
+function renderAll(){renderCustomers();renderOutstanding();renderQuickList();}
+
+setTimeout(()=>{
+    document.getElementById('splash-ring').classList.add('show');
+    document.getElementById('splash-name').classList.add('show');
+    document.getElementById('splash-sub').classList.add('show');
+    document.getElementById('splash-line').classList.add('show');
+},100);
+
+setTimeout(()=>{
+    const s=document.getElementById('splash');
+    s.style.transition='opacity 0.8s ease';
+    s.style.opacity='0';
+    setTimeout(()=>{
+        s.remove();
+        const savedRole=localStorage.getItem('userRole');
+        if (savedRole) { userRole=savedRole; applyRole(); startAutoSync(); renderQuickList(); }
+        else document.getElementById('login-screen').classList.remove('hidden');
+    },800);
+},3000);
+
+loadLocal();
+renderAll();
+document.getElementById('entry-date').value=today();
+document.getElementById('sum-date').value=today();
+document.getElementById('hist-date').value=today();
+document.getElementById('quick-date').value=today();
+document.getElementById('mon-year').value=new Date().getFullYear();
+document.getElementById('mon-month').value=String(new Date().getMonth()+1).padStart(2,'0');
+
+document.getElementById('login-password').addEventListener('keypress', (e) => { if (e.key === 'Enter') checkLogin(); });
+</script>
+</body>
+</html>
