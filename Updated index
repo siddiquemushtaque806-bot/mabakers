@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MA Bakers">
     <title>MA Bakers</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         :root {
@@ -17,11 +15,11 @@
             --text:#F5F0E8; --text-muted:#8A8070; --text-dim:#5A5040;
             --green:#4CAF82; --red:#C94C4C;
         }
-        html,body { height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif; overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+        html, body { height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif; overflow-x:hidden; -webkit-font-smoothing:antialiased; }
 
         /* SPLASH */
         #splash { position:fixed; inset:0; background:radial-gradient(ellipse at center,#1a1500 0%,#000 70%); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-        #splash-ring { width:140px; height:140px; border-radius:50%; border:1px solid rgba(201,168,76,0.2); display:flex; align-items:center; justify-content:center; opacity:0; transform:scale(0.5); transition:all 1s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 40px rgba(201,168,76,0.1),inset 0 0 40px rgba(201,168,76,0.05); }
+        #splash-ring { width:140px; height:140px; border-radius:50%; border:1px solid rgba(201,168,76,0.2); display:flex; align-items:center; justify-content:center; opacity:0; transform:scale(0.5); transition:all 1s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 0 40px rgba(201,168,76,0.1); }
         #splash-ring.show { opacity:1; transform:scale(1); }
         #splash-logo { width:100px; height:100px; border-radius:50%; object-fit:cover; border:1px solid rgba(201,168,76,0.4); }
         #splash-title { font-size:28px; font-weight:300; letter-spacing:8px; text-transform:uppercase; color:var(--gold-light); opacity:0; transform:translateY(15px); transition:all 0.8s ease 0.8s; margin-top:28px; }
@@ -47,13 +45,13 @@
 
         /* HEADER */
         .header { background:linear-gradient(180deg,rgba(20,18,12,0.98) 0%,rgba(12,12,12,0.95) 100%); padding:48px 20px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--gold-border); position:sticky; top:0; z-index:100; backdrop-filter:blur(20px); }
-        .header-logo { width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid var(--gold-dark); box-shadow:0 0 12px rgba(201,168,76,0.2); flex-shrink:0; }
+        .header-logo { width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid var(--gold-dark); flex-shrink:0; }
         .header-info { flex:1; min-width:0; }
         .header-title { font-size:16px; font-weight:600; letter-spacing:1px; color:var(--gold-light); }
         .header-sub { font-size:9px; color:var(--text-dim); letter-spacing:3px; text-transform:uppercase; }
         .header-role { font-size:9px; color:var(--gold); letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
         .header-actions { display:flex; gap:8px; flex-shrink:0; }
-        .btn-header { background:transparent; border:1px solid var(--gold-border-b); color:var(--gold); padding:8px 14px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer; letter-spacing:1px; text-transform:uppercase; font-family:inherit; transition:all 0.2s; }
+        .btn-header { background:transparent; border:1px solid var(--gold-border-b); color:var(--gold); padding:8px 14px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer; letter-spacing:1px; text-transform:uppercase; font-family:inherit; }
         .btn-header:active { opacity:0.7; }
 
         /* BOTTOM NAV */
@@ -93,8 +91,7 @@
         .btn-primary { background:linear-gradient(135deg,#C9A84C 0%,#8B6914 50%,#C9A84C 100%); color:#0C0C0C; font-weight:700; box-shadow:0 4px 20px rgba(201,168,76,0.25); }
         .btn-outline { background:transparent; color:var(--gold); border:1px solid var(--gold-border-b); font-weight:500; }
         .btn-ghost { background:rgba(201,168,76,0.05); color:var(--text-muted); border:1px solid var(--gold-border); }
-        .icon-btn { background:rgba(201,168,76,0.06); border:1px solid var(--gold-border); color:var(--gold); width:34px; height:34px; border-radius:8px; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:opacity 0.1s; }
-        .icon-btn:active { opacity:0.7; }
+        .icon-btn { background:rgba(201,168,76,0.06); border:1px solid var(--gold-border); color:var(--gold); width:34px; height:34px; border-radius:8px; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
         .icon-btn.danger { color:var(--red); border-color:rgba(201,76,76,0.2); }
         .btn-row { display:flex; gap:6px; }
         .back-btn { background:transparent; border:1px solid var(--gold-border); color:var(--gold); padding:8px 14px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer; letter-spacing:1px; text-transform:uppercase; margin-bottom:14px; font-family:inherit; }
@@ -108,9 +105,8 @@
         .stat-value { font-size:16px; font-weight:600; color:var(--text); }
         .gold { color:var(--gold-light) !important; }
         .green { color:var(--green) !important; }
-        .red { color:var(--red) !important; }
 
-        /* LIST ROWS */
+        /* LISTS */
         .list-row { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid rgba(201,168,76,0.05); }
         .list-row:last-child { border-bottom:none; }
         .row-title { font-size:14px; font-weight:500; color:var(--text); }
@@ -135,7 +131,7 @@
         #toast { position:fixed; top:95px; left:50%; transform:translateX(-50%); background:var(--card-alt); border:1px solid var(--gold-border-b); color:var(--gold-light); padding:10px 22px; border-radius:24px; font-size:12px; font-weight:500; z-index:9998; opacity:0; transition:opacity 0.3s; pointer-events:none; white-space:nowrap; box-shadow:0 8px 32px rgba(0,0,0,0.5); }
         #toast.show { opacity:1; }
 
-        /* STATUS BAR */
+        /* STATUS */
         .status-bar { text-align:center; padding:12px; border-radius:10px; font-size:12px; font-weight:600; margin-bottom:10px; display:none; text-transform:uppercase; letter-spacing:1px; }
         .status-bar.show { display:block; }
         .status-bar.success { background:rgba(76,175,130,0.08); color:var(--green); border:1px solid rgba(76,175,130,0.15); }
@@ -147,15 +143,15 @@
         .mode-btn.active { background:linear-gradient(135deg,#C9A84C,#8B6914); color:#0C0C0C; box-shadow:0 2px 12px rgba(201,168,76,0.3); }
 
         /* QUICK ENTRY */
-        .quick-card { background:var(--card); border:1px solid var(--gold-border); border-radius:14px; padding:14px; margin-bottom:10px; position:relative; overflow:hidden; transition:border-color 0.2s,background 0.2s; }
+        .quick-card { background:var(--card); border:1px solid var(--gold-border); border-radius:14px; padding:14px; margin-bottom:10px; position:relative; overflow:hidden; }
         .quick-card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(201,168,76,0.2),transparent); }
         .quick-card.has-data { border-color:var(--gold-border-b); background:linear-gradient(135deg,#161410,#1C1A10); }
         .quick-name { font-size:14px; font-weight:600; color:var(--gold-light); letter-spacing:0.5px; margin-bottom:10px; }
         .quick-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
         .quick-field { display:flex; flex-direction:column; gap:3px; }
         .quick-field-label { font-size:8px; color:var(--text-dim); letter-spacing:0.5px; text-transform:uppercase; font-weight:500; }
-        .quick-input { background:rgba(0,0,0,0.4); border:1px solid var(--gold-border); border-radius:8px; padding:8px 6px; color:var(--text); font-size:14px; text-align:center; outline:none; font-family:inherit; -moz-appearance:textfield; transition:border-color 0.2s; }
-        .quick-input::-webkit-outer-spin-button,.quick-input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+        .quick-input { background:rgba(0,0,0,0.4); border:1px solid var(--gold-border); border-radius:8px; padding:8px 6px; color:var(--text); font-size:14px; text-align:center; outline:none; font-family:inherit; -moz-appearance:textfield; }
+        .quick-input::-webkit-outer-spin-button, .quick-input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
         .quick-input:focus { border-color:var(--gold-dark); }
         .quick-input.payment { color:var(--green); }
 
@@ -264,17 +260,20 @@
                 <div class="form-group"><label class="form-label">Butter Paper</label><input type="number" class="form-input" id="d-butter" placeholder="0" oninput="recalcPreview()"></div>
                 <div class="form-group"><label class="form-label">Mayonnaise</label><input type="number" class="form-input" id="d-mayo" placeholder="0" oninput="recalcPreview()"></div>
                 <div class="form-group"><label class="form-label">Rent</label><input type="number" class="form-input" id="d-rent" placeholder="0" oninput="recalcPreview()"></div>
-                <div class="form-group owner-only" style="grid-column:span 2"><label class="form-label">Payment Received</label><input type="number" class="form-input" id="d-payment" placeholder="0" oninput="recalcPreview()"></div>
+                <div class="form-group owner-only" style="grid-column:span 2">
+                    <label class="form-label">Payment Received</label>
+                    <input type="number" class="form-input" id="d-payment" placeholder="0" oninput="recalcPreview()">
+                </div>
             </div>
         </div>
         <div class="card-premium">
             <div class="card-label">Live Calculation</div>
             <div class="stat-grid">
-                <div class="stat-cell"><div class="stat-label">Shawarma Small</div><div class="stat-value" id="p-small">Rs 0</div></div>
-                <div class="stat-cell"><div class="stat-label">Shawarma Large</div><div class="stat-value" id="p-large">Rs 0</div></div>
+                <div class="stat-cell"><div class="stat-label">Small</div><div class="stat-value" id="p-small">Rs 0</div></div>
+                <div class="stat-cell"><div class="stat-label">Large</div><div class="stat-value" id="p-large">Rs 0</div></div>
                 <div class="stat-cell"><div class="stat-label">Burger</div><div class="stat-value" id="p-burger">Rs 0</div></div>
-                <div class="stat-cell"><div class="stat-label">Butter Paper</div><div class="stat-value" id="p-butter">Rs 0</div></div>
-                <div class="stat-cell"><div class="stat-label">Mayonnaise</div><div class="stat-value" id="p-mayo">Rs 0</div></div>
+                <div class="stat-cell"><div class="stat-label">Butter</div><div class="stat-value" id="p-butter">Rs 0</div></div>
+                <div class="stat-cell"><div class="stat-label">Mayo</div><div class="stat-value" id="p-mayo">Rs 0</div></div>
                 <div class="stat-cell"><div class="stat-label">Rent</div><div class="stat-value" id="p-rent">Rs 0</div></div>
                 <div class="stat-cell accent span2"><div class="stat-label">Day Total</div><div class="stat-value gold" id="p-daytotal">Rs 0</div></div>
                 <div class="stat-cell owner-only"><div class="stat-label">Prev Balance</div><div class="stat-value" id="p-prevout">Rs 0</div></div>
@@ -294,11 +293,11 @@
         <div class="card-label" id="customer-form-title">Add Customer</div>
         <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input" id="cf-name" placeholder="Customer name"></div>
         <div class="stat-grid">
-            <div class="form-group"><label class="form-label">Shawarma Small Rate</label><input type="number" class="form-input" id="cf-small" placeholder="Rate"></div>
-            <div class="form-group"><label class="form-label">Shawarma Large Rate</label><input type="number" class="form-input" id="cf-large" placeholder="0"></div>
+            <div class="form-group"><label class="form-label">Small Rate</label><input type="number" class="form-input" id="cf-small" placeholder="Rate"></div>
+            <div class="form-group"><label class="form-label">Large Rate</label><input type="number" class="form-input" id="cf-large" placeholder="0"></div>
             <div class="form-group"><label class="form-label">Burger Rate</label><input type="number" class="form-input" id="cf-burger" placeholder="0"></div>
-            <div class="form-group"><label class="form-label">Butter Paper Rate</label><input type="number" class="form-input" id="cf-butter" placeholder="0"></div>
-            <div class="form-group"><label class="form-label">Mayonnaise Rate</label><input type="number" class="form-input" id="cf-mayo" placeholder="0"></div>
+            <div class="form-group"><label class="form-label">Butter Rate</label><input type="number" class="form-input" id="cf-butter" placeholder="0"></div>
+            <div class="form-group"><label class="form-label">Mayo Rate</label><input type="number" class="form-input" id="cf-mayo" placeholder="0"></div>
             <div class="form-group"><label class="form-label">Opening Balance</label><input type="number" class="form-input" id="cf-opening" placeholder="0"></div>
         </div>
         <button class="btn btn-primary" id="cf-save-btn" onclick="saveCustomer()">Save Customer</button>
@@ -322,6 +321,23 @@
         <button class="btn btn-primary" onclick="renderCustomerHistory()">View History</button>
     </div>
     <div id="ch-content"></div>
+</div>
+
+<!-- PAYMENTS PAGE -->
+<div class="page owner-only" id="page-payments">
+    <div class="page-title">Payments</div>
+    <div class="page-divider"></div>
+    <div class="card-premium">
+        <div class="card-label">Select Date</div>
+        <div class="date-row">
+            <button class="arrow-btn" onclick="shiftDate('pay-date',-1);buildPaymentList()">◀</button>
+            <input type="date" class="form-input" id="pay-date" onchange="buildPaymentList()">
+            <button class="arrow-btn" onclick="shiftDate('pay-date',+1);buildPaymentList()">▶</button>
+        </div>
+    </div>
+    <div id="payment-list"></div>
+    <div class="status-bar" id="payment-status"></div>
+    <button class="btn btn-primary" onclick="commitPayments()">💾 Save Payments</button>
 </div>
 
 <!-- OUTSTANDING PAGE -->
@@ -393,6 +409,10 @@
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/></svg>
         <span class="nav-label">Customers</span>
     </button>
+    <button class="nav-item owner-only" id="nav-payments" onclick="navigateTo('payments')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <span class="nav-label">Payments</span>
+    </button>
     <button class="nav-item owner-only" id="nav-outstanding" onclick="navigateTo('outstanding')">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <span class="nav-label">Balance</span>
@@ -421,15 +441,12 @@
             <button onclick="saveAsImage()" style="background:linear-gradient(135deg,#C9A84C,#8B6914);border:none;color:#000;padding:8px 12px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📸 Save</button>
         </div>
     </div>
-    <div id="bill-body" style="padding:24px 16px; background:#f8f4e8;"></div>
+    <div id="bill-body" style="padding:24px 16px;background:#f8f4e8;"></div>
 </div>
 
 <script>
 'use strict';
 
-/* ================================================================
-   CONSTANTS & STATE
-================================================================ */
 const PASSWORDS        = { '0000': 'manager', '9900': 'owner' };
 const SYNC_URL         = 'https://mabakers.bonto.run/api/sync';
 const SYNC_INTERVAL_MS = 5 * 60 * 1000;
@@ -445,9 +462,6 @@ let state = {
     currentBillTo:   null,
 };
 
-/* ================================================================
-   STORAGE
-================================================================ */
 function persistData() {
     const json = JSON.stringify(state.data);
     try {
@@ -468,25 +482,19 @@ function loadData() {
     } catch (_) {}
 }
 
-function isValidAppData(obj) {
-    return obj && typeof obj === 'object'
-        && obj.customers && typeof obj.customers === 'object'
-        && obj.daily     && typeof obj.daily     === 'object';
+function isValidAppData(o) {
+    return o && typeof o === 'object'
+        && typeof o.customers === 'object'
+        && typeof o.daily     === 'object';
 }
 
-/* ================================================================
-   UTILITIES
-================================================================ */
-function todayISO()      { return new Date().toISOString().split('T')[0]; }
-function firstOfMonth()  { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`; }
-function fmtMoney(n)     { return 'Rs ' + Math.round(n).toLocaleString('en-PK'); }
-function n(id)           { return parseFloat(document.getElementById(id).value) || 0; }
-function v(id)           { return (document.getElementById(id).value || '').trim(); }
-function set(id, val)    { document.getElementById(id).value = val; }
+function todayISO()     { return new Date().toISOString().split('T')[0]; }
+function firstOfMonth() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-01'; }
+function fmtMoney(n)    { return 'Rs ' + Math.round(n).toLocaleString('en-PK'); }
+function n(id)          { return parseFloat(document.getElementById(id).value) || 0; }
+function v(id)          { return (document.getElementById(id).value || '').trim(); }
+function set(id, val)   { document.getElementById(id).value = val; }
 
-/* ================================================================
-   TOAST & STATUS
-================================================================ */
 let _toastTimer = null;
 function showToast(msg) {
     const el = document.getElementById('toast');
@@ -501,23 +509,21 @@ function showStatus(id, msg, type) {
     const el = document.getElementById(id);
     if (!el) return;
     el.textContent = msg;
-    el.className = `status-bar show ${type}`;
+    el.className = 'status-bar show ' + type;
     clearTimeout(_statusTimers[id]);
     _statusTimers[id] = setTimeout(() => el.classList.remove('show'), 4000);
 }
 
-/* ================================================================
-   NAVIGATION
-================================================================ */
 function navigateTo(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-    const pageEl = document.getElementById(`page-${page}`);
-    const navEl  = document.getElementById(`nav-${page}`);
+    const pageEl = document.getElementById('page-' + page);
+    const navEl  = document.getElementById('nav-'  + page);
     if (pageEl) pageEl.classList.add('active');
     if (navEl)  navEl.classList.add('active');
     if (page === 'daily')       buildQuickList();
     if (page === 'outstanding') renderOutstanding();
+    if (page === 'payments')    buildPaymentList();
 }
 
 function shiftDate(inputId, delta) {
@@ -527,9 +533,6 @@ function shiftDate(inputId, delta) {
     el.value = d.toISOString().split('T')[0];
 }
 
-/* ================================================================
-   AUTH
-================================================================ */
 function handleLogin() {
     const pwd  = document.getElementById('login-input').value;
     const role = PASSWORDS[pwd];
@@ -554,18 +557,15 @@ function handleLogout() {
     stopAutoSync();
     document.getElementById('login-input').value = '';
     document.getElementById('login-screen').classList.remove('hidden');
-    showToast('Logged out successfully');
+    showToast('Logged out');
 }
 
 function applyRole() {
-    const isManager = state.role === 'manager';
-    document.body.classList.toggle('manager-mode', isManager);
-    document.getElementById('header-role').textContent = isManager ? 'Manager' : 'Owner';
+    const mgr = state.role === 'manager';
+    document.body.classList.toggle('manager-mode', mgr);
+    document.getElementById('header-role').textContent = mgr ? 'Manager' : 'Owner';
 }
 
-/* ================================================================
-   SYNC
-================================================================ */
 function startAutoSync() {
     stopAutoSync();
     state.syncTimer = setInterval(syncSilent, SYNC_INTERVAL_MS);
@@ -577,10 +577,7 @@ function stopAutoSync() {
 async function syncSilent() {
     try {
         const res = await fetch(SYNC_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(state.data) });
-        if (res.ok) {
-            const merged = await res.json();
-            if (isValidAppData(merged)) { state.data = merged; persistData(); refreshAllViews(); }
-        }
+        if (res.ok) { const m = await res.json(); if (isValidAppData(m)) { state.data = m; persistData(); refreshAllViews(); } }
     } catch (_) {}
 }
 
@@ -588,73 +585,60 @@ async function syncData() {
     showToast('Syncing…');
     try {
         const res = await fetch(SYNC_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(state.data) });
-        if (!res.ok) { showToast('Sync failed — server error'); return; }
-        const merged = await res.json();
-        if (isValidAppData(merged)) { state.data = merged; persistData(); refreshAllViews(); showToast('✓ Synced successfully'); }
+        if (!res.ok) { showToast('Sync failed'); return; }
+        const m = await res.json();
+        if (isValidAppData(m)) { state.data = m; persistData(); refreshAllViews(); showToast('✓ Synced'); }
         else showToast('Sync error — data protected');
-    } catch (_) { showToast('No internet connection'); }
+    } catch (_) { showToast('No internet'); }
 }
 
 function refreshAllViews() { renderCustomerList(); renderOutstanding(); buildQuickList(); }
 
-/* ================================================================
-   OUTSTANDING CALCULATION
-================================================================ */
-function getPrevOutstanding(customerName, targetDate) {
+function getPrevOutstanding(name, date) {
     const daily = state.data.daily;
-    const priorDates = Object.keys(daily)
-        .filter(d => daily[d][customerName] !== undefined && d < targetDate)
-        .sort();
-    if (priorDates.length > 0)
-        return daily[priorDates[priorDates.length - 1]][customerName].outstanding || 0;
-    const customer = state.data.customers[customerName];
-    return customer ? (customer.opening_outstanding || 0) : 0;
+    const prior = Object.keys(daily).filter(d => daily[d][name] !== undefined && d < date).sort();
+    if (prior.length) return daily[prior[prior.length-1]][name].outstanding || 0;
+    return (state.data.customers[name] || {}).opening_outstanding || 0;
 }
 
-function cascadeRecalc(customerName, fromDate) {
-    const daily = state.data.daily;
-    const futureDates = Object.keys(daily)
-        .filter(d => daily[d][customerName] !== undefined && d > fromDate)
-        .sort();
-    for (const date of futureDates) {
-        const entry   = daily[date][customerName];
-        const prevOut = getPrevOutstanding(customerName, date);
-        entry.prev_outstanding = prevOut;
-        entry.outstanding      = prevOut + entry.day_total - entry.payment;
+function cascadeRecalc(name, fromDate) {
+    const daily   = state.data.daily;
+    const futures = Object.keys(daily).filter(d => daily[d][name] !== undefined && d > fromDate).sort();
+    for (const date of futures) {
+        const e   = daily[date][name];
+        const po  = getPrevOutstanding(name, date);
+        e.prev_outstanding = po;
+        e.outstanding      = po + e.day_total - e.payment;
     }
 }
 
-/* ================================================================
-   QUICK ENTRY
-================================================================ */
 function buildQuickList() {
-    const date      = document.getElementById('quick-date').value;
-    const container = document.getElementById('quick-list');
-    const customers = state.data.customers;
-    const names     = Object.keys(customers);
+    const date     = document.getElementById('quick-date').value;
+    const container= document.getElementById('quick-list');
+    const names    = Object.keys(state.data.customers);
     if (!names.length) { container.innerHTML = '<div class="empty-state">Add customers first</div>'; return; }
-    const existing  = state.data.daily[date] || {};
+    const existing = state.data.daily[date] || {};
 
-    const field = (label, fieldKey, val, extra = '') =>
+    const field = (label, customer, fieldKey, val, cls='') =>
         `<div class="quick-field">
             <div class="quick-field-label">${label}</div>
-            <input type="number" class="quick-input ${extra}"
-                   data-customer="${fieldKey.split('|')[0]}" data-field="${fieldKey.split('|')[1]}"
-                   value="${val || ''}" placeholder="0">
+            <input type="number" class="quick-input ${cls}"
+                   data-customer="${customer}" data-field="${fieldKey}"
+                   value="${val||''}" placeholder="0">
          </div>`;
 
     container.innerHTML = names.map(name => {
-        const c = customers[name];
+        const c = state.data.customers[name];
         const e = existing[name] || {};
         let fields = '';
-        if ((c.shawarma_small_rate||0) > 0) fields += field('Small',   `${name}|small`,   e.shawarma_small_qty  || '');
-        if ((c.shawarma_large_rate||0) > 0) fields += field('Large',   `${name}|large`,   e.shawarma_large_qty  || '');
-        if ((c.burger_rate||0)         > 0) fields += field('Burger',  `${name}|burger`,  e.burger_qty          || '');
-        if ((c.butter_rate||0)         > 0) fields += field('Butter',  `${name}|butter`,  e.butter_qty          || '');
-        if ((c.mayo_rate||0)           > 0) fields += field('Mayo',    `${name}|mayo`,    e.mayo_qty            || '');
-                                            fields += field('Rent',    `${name}|rent`,    e.rent                || '');
-        if (state.role === 'owner')         fields += field('💵 Pay',  `${name}|payment`, e.payment             || '', 'payment');
-        return `<div class="quick-card ${Object.keys(e).length ? 'has-data' : ''}">
+        if ((c.shawarma_small_rate||0) > 0) fields += field('Small',  name, 'small',   e.shawarma_small_qty||'');
+        if ((c.shawarma_large_rate||0) > 0) fields += field('Large',  name, 'large',   e.shawarma_large_qty||'');
+        if ((c.burger_rate||0)         > 0) fields += field('Burger', name, 'burger',  e.burger_qty||'');
+        if ((c.butter_rate||0)         > 0) fields += field('Butter', name, 'butter',  e.butter_qty||'');
+        if ((c.mayo_rate||0)           > 0) fields += field('Mayo',   name, 'mayo',    e.mayo_qty||'');
+                                            fields += field('Rent',   name, 'rent',    e.rent||'');
+        if (state.role === 'owner')         fields += field('💵 Pay', name, 'payment', e.payment||'', 'payment');
+        return `<div class="quick-card ${Object.keys(e).length?'has-data':''}">
                     <div class="quick-name">${name}</div>
                     <div class="quick-grid">${fields}</div>
                 </div>`;
@@ -662,731 +646,586 @@ function buildQuickList() {
 }
 
 function commitQuickEntries() {
-    const date    = document.getElementById('quick-date').value;
-    const inputs  = document.querySelectorAll('.quick-input');
-    const daily   = state.data.daily;
-    const byCustomer = {};
-    inputs.forEach(input => {
-        const name  = input.dataset.customer;
-        const field = input.dataset.field;
-        if (!byCustomer[name]) byCustomer[name] = {};
-        byCustomer[name][field] = parseFloat(input.value) || 0;
+    const date  = document.getElementById('quick-date').value;
+    const daily = state.data.daily;
+    const map   = {};
+    document.querySelectorAll('.quick-input').forEach(inp => {
+        const nm = inp.dataset.customer, f = inp.dataset.field;
+        if (!map[nm]) map[nm] = {};
+        map[nm][f] = parseFloat(inp.value) || 0;
     });
     if (!daily[date]) daily[date] = {};
-    let savedCount = 0;
-    for (const name of Object.keys(byCustomer)) {
-        const d = byCustomer[name];
-        const c = state.data.customers[name];
+    let saved = 0;
+    for (const name of Object.keys(map)) {
+        const d = map[name], c = state.data.customers[name];
         if (!c) continue;
-        const totalQty = (d.small||0)+(d.large||0)+(d.burger||0)+(d.butter||0)+(d.mayo||0);
-        const hasData  = totalQty > 0 || (d.payment||0) > 0 || (d.rent||0) > 0;
-        if (!hasData) { if (daily[date][name]) delete daily[date][name]; continue; }
-        const smallT  = (d.small||0)  * (c.shawarma_small_rate||0);
-        const largeT  = (d.large||0)  * (c.shawarma_large_rate||0);
-        const burgerT = (d.burger||0) * (c.burger_rate||0);
-        const butterT = (d.butter||0) * (c.butter_rate||0);
-        const mayoT   = (d.mayo||0)   * (c.mayo_rate||0);
-        const dayTotal = smallT + largeT + burgerT + butterT + mayoT + (d.rent||0);
-        let payment = d.payment || 0;
-        if (state.role === 'manager') payment = daily[date][name] ? (daily[date][name].payment||0) : 0;
-        const prevOut = getPrevOutstanding(name, date);
+        const qty = (d.small||0)+(d.large||0)+(d.burger||0)+(d.butter||0)+(d.mayo||0);
+        if (!qty && !(d.payment||0) && !(d.rent||0)) { if (daily[date][name]) delete daily[date][name]; continue; }
+        const sT=(d.small||0)*(c.shawarma_small_rate||0), lT=(d.large||0)*(c.shawarma_large_rate||0);
+        const bT=(d.burger||0)*(c.burger_rate||0), bpT=(d.butter||0)*(c.butter_rate||0), mT=(d.mayo||0)*(c.mayo_rate||0);
+        const dt=sT+lT+bT+bpT+mT+(d.rent||0);
+        let pay = d.payment||0;
+        if (state.role==='manager') pay = daily[date][name] ? (daily[date][name].payment||0) : 0;
+        const po = getPrevOutstanding(name, date);
         daily[date][name] = {
-            shawarma_small_qty:d.small||0, shawarma_small_rate:c.shawarma_small_rate||0, shawarma_small_total:smallT,
-            shawarma_large_qty:d.large||0, shawarma_large_rate:c.shawarma_large_rate||0, shawarma_large_total:largeT,
-            burger_qty:d.burger||0, burger_rate:c.burger_rate||0, burger_total:burgerT,
-            butter_qty:d.butter||0, butter_rate:c.butter_rate||0, butter_total:butterT,
-            mayo_qty:d.mayo||0,     mayo_rate:c.mayo_rate||0,     mayo_total:mayoT,
-            rent:d.rent||0, day_total:dayTotal, payment, prev_outstanding:prevOut,
-            outstanding:prevOut + dayTotal - payment,
+            shawarma_small_qty:d.small||0, shawarma_small_rate:c.shawarma_small_rate||0, shawarma_small_total:sT,
+            shawarma_large_qty:d.large||0, shawarma_large_rate:c.shawarma_large_rate||0, shawarma_large_total:lT,
+            burger_qty:d.burger||0, burger_rate:c.burger_rate||0, burger_total:bT,
+            butter_qty:d.butter||0, butter_rate:c.butter_rate||0, butter_total:bpT,
+            mayo_qty:d.mayo||0, mayo_rate:c.mayo_rate||0, mayo_total:mT,
+            rent:d.rent||0, day_total:dt, payment:pay, prev_outstanding:po, outstanding:po+dt-pay,
         };
-        cascadeRecalc(name, date);
-        savedCount++;
+        cascadeRecalc(name, date); saved++;
     }
-    if (daily[date] && Object.keys(daily[date]).length === 0) delete daily[date];
+    if (daily[date] && !Object.keys(daily[date]).length) delete daily[date];
     persistData();
-    if (savedCount > 0) { showStatus('quick-status', `✓ ${savedCount} ${savedCount===1?'entry':'entries'} saved`, 'success'); buildQuickList(); }
-    else showStatus('quick-status', 'No data to save', 'warning');
+    saved > 0 ? showStatus('quick-status', `✓ ${saved} entries saved`, 'success')
+              : showStatus('quick-status', 'No data to save', 'warning');
+    buildQuickList();
 }
 
-/* ================================================================
-   DETAILED ENTRY
-================================================================ */
 function switchEntryMode(mode) {
-    const isQuick = mode === 'quick';
-    document.getElementById('mode-btn-quick').classList.toggle('active', isQuick);
-    document.getElementById('mode-btn-detailed').classList.toggle('active', !isQuick);
-    document.getElementById('entry-quick').style.display    = isQuick ? 'block' : 'none';
-    document.getElementById('entry-detailed').style.display = isQuick ? 'none'  : 'block';
-    if (isQuick) buildQuickList();
+    const q = mode === 'quick';
+    document.getElementById('mode-btn-quick').classList.toggle('active', q);
+    document.getElementById('mode-btn-detailed').classList.toggle('active', !q);
+    document.getElementById('entry-quick').style.display    = q ? 'block' : 'none';
+    document.getElementById('entry-detailed').style.display = q ? 'none'  : 'block';
+    if (q) buildQuickList();
 }
 
 function onDetailChange() {
-    const name = v('detail-customer');
-    const date = v('detail-date');
+    const name = v('detail-customer'), date = v('detail-date');
     if (name && date) {
-        const existing = state.data.daily[date]?.[name];
-        if (existing) {
-            set('d-small',   existing.shawarma_small_qty || '');
-            set('d-large',   existing.shawarma_large_qty || '');
-            set('d-burger',  existing.burger_qty         || '');
-            set('d-butter',  existing.butter_qty         || '');
-            set('d-mayo',    existing.mayo_qty           || '');
-            set('d-rent',    existing.rent               || '');
-            if (state.role === 'owner') set('d-payment', existing.payment || '');
+        const e = state.data.daily[date]?.[name];
+        if (e) {
+            set('d-small',   e.shawarma_small_qty||'');
+            set('d-large',   e.shawarma_large_qty||'');
+            set('d-burger',  e.burger_qty||'');
+            set('d-butter',  e.butter_qty||'');
+            set('d-mayo',    e.mayo_qty||'');
+            set('d-rent',    e.rent||'');
+            if (state.role==='owner') set('d-payment', e.payment||'');
         } else {
-            ['d-small','d-large','d-burger','d-butter','d-mayo','d-rent','d-payment'].forEach(id => set(id,''));
+            ['d-small','d-large','d-burger','d-butter','d-mayo','d-rent','d-payment'].forEach(id=>set(id,''));
         }
     }
     recalcPreview();
 }
 
 function recalcPreview() {
-    const name = v('detail-customer');
-    const date = v('detail-date');
+    const name = v('detail-customer'), date = v('detail-date');
     if (!name || !state.data.customers[name]) {
         ['p-small','p-large','p-burger','p-butter','p-mayo','p-rent','p-daytotal','p-prevout','p-newout']
-            .forEach(id => { const el = document.getElementById(id); if(el) el.textContent='Rs 0'; });
+            .forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='Rs 0';});
         return;
     }
-    const c       = state.data.customers[name];
-    const smallT  = n('d-small')  * (c.shawarma_small_rate||0);
-    const largeT  = n('d-large')  * (c.shawarma_large_rate||0);
-    const burgerT = n('d-burger') * (c.burger_rate||0);
-    const butterT = n('d-butter') * (c.butter_rate||0);
-    const mayoT   = n('d-mayo')   * (c.mayo_rate||0);
-    const rentT   = n('d-rent');
-    const dayTotal = smallT+largeT+burgerT+butterT+mayoT+rentT;
-    const prevOut  = getPrevOutstanding(name, date);
-    const payment  = state.role === 'owner' ? n('d-payment') : 0;
-    const newOut   = prevOut + dayTotal - payment;
-    document.getElementById('p-small').textContent   = fmtMoney(smallT);
-    document.getElementById('p-large').textContent   = fmtMoney(largeT);
-    document.getElementById('p-burger').textContent  = fmtMoney(burgerT);
-    document.getElementById('p-butter').textContent  = fmtMoney(butterT);
-    document.getElementById('p-mayo').textContent    = fmtMoney(mayoT);
-    document.getElementById('p-rent').textContent    = fmtMoney(rentT);
-    document.getElementById('p-daytotal').textContent = fmtMoney(dayTotal);
-    const prevEl = document.getElementById('p-prevout');
-    const newEl  = document.getElementById('p-newout');
-    if (prevEl) prevEl.textContent = fmtMoney(prevOut);
-    if (newEl)  { newEl.textContent = fmtMoney(newOut); newEl.className = 'stat-value '+(newOut<=0?'green':'gold'); }
+    const c=state.data.customers[name];
+    const sT=n('d-small')*(c.shawarma_small_rate||0), lT=n('d-large')*(c.shawarma_large_rate||0);
+    const bT=n('d-burger')*(c.burger_rate||0), bpT=n('d-butter')*(c.butter_rate||0), mT=n('d-mayo')*(c.mayo_rate||0);
+    const dt=sT+lT+bT+bpT+mT+n('d-rent'), po=getPrevOutstanding(name,date);
+    const pay=state.role==='owner'?n('d-payment'):0, no=po+dt-pay;
+    document.getElementById('p-small').textContent=fmtMoney(sT);
+    document.getElementById('p-large').textContent=fmtMoney(lT);
+    document.getElementById('p-burger').textContent=fmtMoney(bT);
+    document.getElementById('p-butter').textContent=fmtMoney(bpT);
+    document.getElementById('p-mayo').textContent=fmtMoney(mT);
+    document.getElementById('p-rent').textContent=fmtMoney(n('d-rent'));
+    document.getElementById('p-daytotal').textContent=fmtMoney(dt);
+    const pe=document.getElementById('p-prevout'), ne=document.getElementById('p-newout');
+    if(pe) pe.textContent=fmtMoney(po);
+    if(ne){ne.textContent=fmtMoney(no);ne.className='stat-value '+(no<=0?'green':'gold');}
 }
 
 function commitDetailedEntry() {
-    const name = v('detail-customer');
-    const date = v('detail-date');
-    if (!name || !state.data.customers[name]) { showToast('Please select a customer'); return; }
-    const c       = state.data.customers[name];
-    const smallQty  = n('d-small');
-    const largeQty  = n('d-large');
-    const burgerQty = n('d-burger');
-    const butterQty = n('d-butter');
-    const mayoQty   = n('d-mayo');
-    const rent      = n('d-rent');
-    const smallT  = smallQty  * (c.shawarma_small_rate||0);
-    const largeT  = largeQty  * (c.shawarma_large_rate||0);
-    const burgerT = burgerQty * (c.burger_rate||0);
-    const butterT = butterQty * (c.butter_rate||0);
-    const mayoT   = mayoQty   * (c.mayo_rate||0);
-    const dayTotal = smallT+largeT+burgerT+butterT+mayoT+rent;
-    let payment = 0;
-    if (state.role === 'owner') payment = n('d-payment');
-    else payment = state.data.daily[date]?.[name]?.payment || 0;
-    const prevOut = getPrevOutstanding(name, date);
-    if (!state.data.daily[date]) state.data.daily[date] = {};
-    state.data.daily[date][name] = {
-        shawarma_small_qty:smallQty,   shawarma_small_rate:c.shawarma_small_rate||0, shawarma_small_total:smallT,
-        shawarma_large_qty:largeQty,   shawarma_large_rate:c.shawarma_large_rate||0, shawarma_large_total:largeT,
-        burger_qty:burgerQty,          burger_rate:c.burger_rate||0,                 burger_total:burgerT,
-        butter_qty:butterQty,          butter_rate:c.butter_rate||0,                 butter_total:butterT,
-        mayo_qty:mayoQty,              mayo_rate:c.mayo_rate||0,                     mayo_total:mayoT,
-        rent, day_total:dayTotal, payment, prev_outstanding:prevOut,
-        outstanding:prevOut+dayTotal-payment,
+    const name=v('detail-customer'), date=v('detail-date');
+    if(!name||!state.data.customers[name]){showToast('Select a customer');return;}
+    const c=state.data.customers[name];
+    const sq=n('d-small'),lq=n('d-large'),bq=n('d-burger'),bpq=n('d-butter'),mq=n('d-mayo'),r=n('d-rent');
+    const sT=sq*(c.shawarma_small_rate||0),lT=lq*(c.shawarma_large_rate||0);
+    const bT=bq*(c.burger_rate||0),bpT=bpq*(c.butter_rate||0),mT=mq*(c.mayo_rate||0);
+    const dt=sT+lT+bT+bpT+mT+r;
+    let pay=0;
+    if(state.role==='owner') pay=n('d-payment');
+    else pay=state.data.daily[date]?.[name]?.payment||0;
+    const po=getPrevOutstanding(name,date);
+    if(!state.data.daily[date]) state.data.daily[date]={};
+    state.data.daily[date][name]={
+        shawarma_small_qty:sq,shawarma_small_rate:c.shawarma_small_rate||0,shawarma_small_total:sT,
+        shawarma_large_qty:lq,shawarma_large_rate:c.shawarma_large_rate||0,shawarma_large_total:lT,
+        burger_qty:bq,burger_rate:c.burger_rate||0,burger_total:bT,
+        butter_qty:bpq,butter_rate:c.butter_rate||0,butter_total:bpT,
+        mayo_qty:mq,mayo_rate:c.mayo_rate||0,mayo_total:mT,
+        rent:r,day_total:dt,payment:pay,prev_outstanding:po,outstanding:po+dt-pay,
     };
-    cascadeRecalc(name, date);
-    persistData();
-    const newOut = prevOut + dayTotal - payment;
-    if (state.role === 'owner') showStatus('detail-status', `Saved · Outstanding ${fmtMoney(newOut)}`, newOut<=0?'success':'warning');
-    else showStatus('detail-status', 'Entry saved successfully', 'success');
-    ['d-small','d-large','d-burger','d-butter','d-mayo','d-rent','d-payment'].forEach(id => set(id,''));
+    cascadeRecalc(name,date); persistData();
+    const no=po+dt-pay;
+    state.role==='owner'
+        ? showStatus('detail-status',`Saved · Outstanding ${fmtMoney(no)}`,no<=0?'success':'warning')
+        : showStatus('detail-status','Entry saved','success');
+    ['d-small','d-large','d-burger','d-butter','d-mayo','d-rent','d-payment'].forEach(id=>set(id,''));
     recalcPreview();
 }
 
-/* ================================================================
-   CUSTOMERS
-================================================================ */
 function renderCustomerList() {
-    const names  = Object.keys(state.data.customers);
-    const listEl = document.getElementById('customer-list');
-    const selEl  = document.getElementById('detail-customer');
-    if (!names.length) {
-        listEl.innerHTML = '<div class="empty-state">No customers added yet</div>';
-    } else {
-        listEl.innerHTML = names.map(name => {
-            const c   = state.data.customers[name];
-            const ownerBtns = state.role === 'owner'
-                ? `<button class="icon-btn" onclick="editCustomer('${name}')">✏️</button>
-                   <button class="icon-btn danger" onclick="deleteCustomer('${name}')">🗑️</button>`
-                : '';
-            return `<div class="list-row">
-                        <div>
-                            <div class="row-title">${name}</div>
-                            <div class="row-sub">Small ${fmtMoney(c.shawarma_small_rate||0)} · Large ${c.shawarma_large_rate?fmtMoney(c.shawarma_large_rate):'—'} · Burger ${c.burger_rate?fmtMoney(c.burger_rate):'—'}</div>
-                            <div class="row-sub">Butter ${c.butter_rate?fmtMoney(c.butter_rate):'—'} · Mayo ${c.mayo_rate?fmtMoney(c.mayo_rate):'—'}</div>
-                        </div>
-                        <div class="btn-row">
-                            <button class="icon-btn" onclick="openCustomerHistory('${name}')">👁</button>
-                            ${ownerBtns}
-                        </div>
-                    </div>`;
+    const names=Object.keys(state.data.customers);
+    const listEl=document.getElementById('customer-list');
+    const selEl=document.getElementById('detail-customer');
+    if(!names.length){listEl.innerHTML='<div class="empty-state">No customers yet</div>';}
+    else {
+        listEl.innerHTML=names.map(name=>{
+            const c=state.data.customers[name];
+            const ob=state.role==='owner'
+                ?`<button class="icon-btn" onclick="editCustomer('${name}')">✏️</button>
+                  <button class="icon-btn danger" onclick="deleteCustomer('${name}')">🗑️</button>`:'';
+            return `<div class="list-row"><div>
+                <div class="row-title">${name}</div>
+                <div class="row-sub">Small ${fmtMoney(c.shawarma_small_rate||0)} · Large ${c.shawarma_large_rate?fmtMoney(c.shawarma_large_rate):'—'} · Burger ${c.burger_rate?fmtMoney(c.burger_rate):'—'}</div>
+                <div class="row-sub">Butter ${c.butter_rate?fmtMoney(c.butter_rate):'—'} · Mayo ${c.mayo_rate?fmtMoney(c.mayo_rate):'—'}</div>
+            </div><div class="btn-row">
+                <button class="icon-btn" onclick="openCustomerHistory('${name}')">👁</button>${ob}
+            </div></div>`;
         }).join('');
     }
-    const prev = selEl.value;
-    selEl.innerHTML = '<option value="">Select customer…</option>'
-        + names.map(n => `<option value="${n}" ${n===prev?'selected':''}>${n}</option>`).join('');
+    const prev=selEl.value;
+    selEl.innerHTML='<option value="">Select customer…</option>'+
+        names.map(n=>`<option value="${n}"${n===prev?' selected':''}>${n}</option>`).join('');
 }
 
 function saveCustomer() {
-    const newName   = v('cf-name');
-    const smallRate = parseFloat(document.getElementById('cf-small').value)  || 0;
-    const largeRate = parseFloat(document.getElementById('cf-large').value)  || 0;
-    const burgerRate= parseFloat(document.getElementById('cf-burger').value) || 0;
-    const butterRate= parseFloat(document.getElementById('cf-butter').value) || 0;
-    const mayoRate  = parseFloat(document.getElementById('cf-mayo').value)   || 0;
-    const opening   = parseFloat(document.getElementById('cf-opening').value)|| 0;
-    if (!newName)   { showToast('Please enter customer name');        return; }
-    if (!smallRate) { showToast('Please enter Shawarma Small rate');  return; }
-    const oldName = state.editingCustomer;
-    if (oldName && oldName !== newName) {
-        delete state.data.customers[oldName];
-        for (const date of Object.keys(state.data.daily)) {
-            if (state.data.daily[date][oldName] !== undefined) {
-                state.data.daily[date][newName] = state.data.daily[date][oldName];
-                delete state.data.daily[date][oldName];
+    const newName=v('cf-name');
+    const sr=parseFloat(document.getElementById('cf-small').value)||0;
+    const lr=parseFloat(document.getElementById('cf-large').value)||0;
+    const br=parseFloat(document.getElementById('cf-burger').value)||0;
+    const bpr=parseFloat(document.getElementById('cf-butter').value)||0;
+    const mr=parseFloat(document.getElementById('cf-mayo').value)||0;
+    const op=parseFloat(document.getElementById('cf-opening').value)||0;
+    if(!newName){showToast('Enter customer name');return;}
+    if(!sr){showToast('Enter Shawarma Small rate');return;}
+    const old=state.editingCustomer;
+    if(old && old!==newName){
+        delete state.data.customers[old];
+        for(const d of Object.keys(state.data.daily)){
+            if(state.data.daily[d][old]!==undefined){
+                state.data.daily[d][newName]=state.data.daily[d][old];
+                delete state.data.daily[d][old];
             }
         }
     }
-    state.data.customers[newName] = { shawarma_small_rate:smallRate, shawarma_large_rate:largeRate, burger_rate:burgerRate, butter_rate:butterRate, mayo_rate:mayoRate, opening_outstanding:opening };
-    persistData();
-    resetCustomerForm();
-    renderCustomerList();
-    buildQuickList();
-    showToast(oldName ? 'Customer updated' : 'Customer added');
+    state.data.customers[newName]={shawarma_small_rate:sr,shawarma_large_rate:lr,burger_rate:br,butter_rate:bpr,mayo_rate:mr,opening_outstanding:op};
+    persistData(); resetCustomerForm(); renderCustomerList(); buildQuickList();
+    showToast(old?'Customer updated':'Customer added');
 }
 
 function editCustomer(name) {
-    const c = state.data.customers[name];
-    state.editingCustomer = name;
-    set('cf-name',    name);
-    set('cf-small',   c.shawarma_small_rate || '');
-    set('cf-large',   c.shawarma_large_rate || '');
-    set('cf-burger',  c.burger_rate         || '');
-    set('cf-butter',  c.butter_rate         || '');
-    set('cf-mayo',    c.mayo_rate           || '');
-    set('cf-opening', c.opening_outstanding || '');
-    document.getElementById('customer-form-title').textContent = 'Edit Customer';
-    document.getElementById('cf-save-btn').textContent         = 'Update Customer';
-    navigateTo('customers');
-    window.scrollTo({ top:0, behavior:'smooth' });
+    const c=state.data.customers[name];
+    state.editingCustomer=name;
+    set('cf-name',name); set('cf-small',c.shawarma_small_rate||''); set('cf-large',c.shawarma_large_rate||'');
+    set('cf-burger',c.burger_rate||''); set('cf-butter',c.butter_rate||''); set('cf-mayo',c.mayo_rate||'');
+    set('cf-opening',c.opening_outstanding||'');
+    document.getElementById('customer-form-title').textContent='Edit Customer';
+    document.getElementById('cf-save-btn').textContent='Update Customer';
+    navigateTo('customers'); window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function deleteCustomer(name) {
-    if (!confirm(`Delete "${name}"?\n\nAll history entries will be kept.`)) return;
+    if(!confirm(`Delete "${name}"?`)) return;
     delete state.data.customers[name];
-    persistData();
-    renderCustomerList();
-    buildQuickList();
-    showToast(`${name} deleted`);
+    persistData(); renderCustomerList(); buildQuickList();
+    showToast(name+' deleted');
 }
 
 function resetCustomerForm() {
-    state.editingCustomer = null;
-    ['cf-name','cf-small','cf-large','cf-burger','cf-butter','cf-mayo','cf-opening'].forEach(id => set(id,''));
-    document.getElementById('customer-form-title').textContent = 'Add Customer';
-    document.getElementById('cf-save-btn').textContent         = 'Save Customer';
+    state.editingCustomer=null;
+    ['cf-name','cf-small','cf-large','cf-burger','cf-butter','cf-mayo','cf-opening'].forEach(id=>set(id,''));
+    document.getElementById('customer-form-title').textContent='Add Customer';
+    document.getElementById('cf-save-btn').textContent='Save Customer';
 }
 
-/* ================================================================
-   CUSTOMER HISTORY
-================================================================ */
 function openCustomerHistory(name) {
-    state.historyCustomer = name;
-    document.getElementById('ch-title').textContent = name;
-    set('ch-from', firstOfMonth());
-    set('ch-to',   todayISO());
-    document.getElementById('ch-content').innerHTML = '';
-    navigateTo('cust-history');
-    renderCustomerHistory();
+    state.historyCustomer=name;
+    document.getElementById('ch-title').textContent=name;
+    set('ch-from',firstOfMonth()); set('ch-to',todayISO());
+    document.getElementById('ch-content').innerHTML='';
+    navigateTo('cust-history'); renderCustomerHistory();
 }
 
 function renderCustomerHistory() {
-    const name    = state.historyCustomer;
-    if (!name) return;
-    const from    = v('ch-from');
-    const to      = v('ch-to');
-    const daily   = state.data.daily;
-    const content = document.getElementById('ch-content');
-    const dates   = Object.keys(daily).filter(d => daily[d][name] !== undefined && d >= from && d <= to).sort();
-    if (!dates.length) { content.innerHTML = '<div class="empty-state">No entries found for this period</div>'; return; }
-    let totals = { smallQty:0,largeQty:0,burgerQty:0,butterQty:0,mayoQty:0, smallAmt:0,largeAmt:0,burgerAmt:0,butterAmt:0,mayoAmt:0, rent:0,paid:0,dayTotal:0 };
-    const entryCards = [...dates].reverse().map(d => {
-        const e = daily[d][name];
-        totals.smallQty  += e.shawarma_small_qty  || 0; totals.smallAmt  += e.shawarma_small_total  || 0;
-        totals.largeQty  += e.shawarma_large_qty  || 0; totals.largeAmt  += e.shawarma_large_total  || 0;
-        totals.burgerQty += e.burger_qty           || 0; totals.burgerAmt += e.burger_total          || 0;
-        totals.butterQty += e.butter_qty           || 0; totals.butterAmt += e.butter_total          || 0;
-        totals.mayoQty   += e.mayo_qty             || 0; totals.mayoAmt   += e.mayo_total            || 0;
-        totals.rent      += e.rent                 || 0; totals.paid      += e.payment               || 0;
-        totals.dayTotal  += e.day_total            || 0;
-        let details = '';
-        if (e.shawarma_small_qty) details += `<div class="row-sub">🫓 Small: ${e.shawarma_small_qty} = ${fmtMoney(e.shawarma_small_total||0)}</div>`;
-        if (e.shawarma_large_qty) details += `<div class="row-sub">🫓 Large: ${e.shawarma_large_qty} = ${fmtMoney(e.shawarma_large_total||0)}</div>`;
-        if (e.burger_qty)         details += `<div class="row-sub">🍔 Burger: ${e.burger_qty} = ${fmtMoney(e.burger_total||0)}</div>`;
-        if (e.butter_qty)         details += `<div class="row-sub">🧻 Butter: ${e.butter_qty} = ${fmtMoney(e.butter_total||0)}</div>`;
-        if (e.mayo_qty)           details += `<div class="row-sub">🥫 Mayo: ${e.mayo_qty} = ${fmtMoney(e.mayo_total||0)}</div>`;
-        if (e.rent)               details += `<div class="row-sub">🏠 Rent: ${fmtMoney(e.rent)}</div>`;
-        const ownerDetails = state.role === 'owner'
-            ? `<div class="row-sub" style="color:var(--green);margin-top:4px">💵 Payment: ${fmtMoney(e.payment||0)}</div>
-               <div class="row-sub">Prev Balance: ${fmtMoney(e.prev_outstanding||0)}</div>
-               <div class="row-sub" style="color:${(e.outstanding||0)<=0?'var(--green)':'var(--gold-light)'}">Outstanding: ${(e.outstanding||0)<=0?'PAID ✓':fmtMoney(e.outstanding)}</div>` : '';
-        return `<div class="history-entry"><div class="history-date">${d}</div>${details}
-                    <div class="row-sub" style="color:var(--gold-light);font-weight:600;margin-top:6px">Day Total: ${fmtMoney(e.day_total||0)}</div>${ownerDetails}</div>`;
+    const name=state.historyCustomer; if(!name) return;
+    const from=v('ch-from'), to=v('ch-to'), daily=state.data.daily;
+    const content=document.getElementById('ch-content');
+    const dates=Object.keys(daily).filter(d=>daily[d][name]!==undefined&&d>=from&&d<=to).sort();
+    if(!dates.length){content.innerHTML='<div class="empty-state">No entries found</div>';return;}
+    let tot={ssq:0,slq:0,bq:0,bpq:0,mq:0,ssA:0,slA:0,bA:0,bpA:0,mA:0,rent:0,paid:0,dt:0};
+    const cards=[...dates].reverse().map(d=>{
+        const e=daily[d][name];
+        tot.ssq+=e.shawarma_small_qty||0; tot.ssA+=e.shawarma_small_total||0;
+        tot.slq+=e.shawarma_large_qty||0; tot.slA+=e.shawarma_large_total||0;
+        tot.bq+=e.burger_qty||0;          tot.bA+=e.burger_total||0;
+        tot.bpq+=e.butter_qty||0;         tot.bpA+=e.butter_total||0;
+        tot.mq+=e.mayo_qty||0;            tot.mA+=e.mayo_total||0;
+        tot.rent+=e.rent||0; tot.paid+=e.payment||0; tot.dt+=e.day_total||0;
+        let det='';
+        if(e.shawarma_small_qty) det+=`<div class="row-sub">🫓 Small: ${e.shawarma_small_qty} = ${fmtMoney(e.shawarma_small_total||0)}</div>`;
+        if(e.shawarma_large_qty) det+=`<div class="row-sub">🫓 Large: ${e.shawarma_large_qty} = ${fmtMoney(e.shawarma_large_total||0)}</div>`;
+        if(e.burger_qty)         det+=`<div class="row-sub">🍔 Burger: ${e.burger_qty} = ${fmtMoney(e.burger_total||0)}</div>`;
+        if(e.butter_qty)         det+=`<div class="row-sub">🧻 Butter: ${e.butter_qty} = ${fmtMoney(e.butter_total||0)}</div>`;
+        if(e.mayo_qty)           det+=`<div class="row-sub">🥫 Mayo: ${e.mayo_qty} = ${fmtMoney(e.mayo_total||0)}</div>`;
+        if(e.rent)               det+=`<div class="row-sub">🏠 Rent: ${fmtMoney(e.rent)}</div>`;
+        const od=state.role==='owner'?`
+            <div class="row-sub" style="color:var(--green);margin-top:4px">💵 Payment: ${fmtMoney(e.payment||0)}</div>
+            <div class="row-sub">Prev: ${fmtMoney(e.prev_outstanding||0)}</div>
+            <div class="row-sub" style="color:${(e.outstanding||0)<=0?'var(--green)':'var(--gold-light)'}">
+                Outstanding: ${(e.outstanding||0)<=0?'PAID ✓':fmtMoney(e.outstanding)}
+            </div>`:'';
+        return `<div class="history-entry"><div class="history-date">${d}</div>${det}
+            <div class="row-sub" style="color:var(--gold-light);font-weight:600;margin-top:6px">Day Total: ${fmtMoney(e.day_total||0)}</div>${od}</div>`;
     }).join('');
-    const allDates  = Object.keys(daily).filter(d => daily[d][name]).sort();
-    const latestOut = allDates.length ? (daily[allDates[allDates.length-1]][name].outstanding||0) : 0;
-    const ownerSummary = state.role === 'owner'
-        ? `<div class="stat-cell"><div class="stat-label">Total Paid</div><div class="stat-value green">${fmtMoney(totals.paid)}</div></div>
-           <div class="stat-cell accent span2"><div class="stat-label">Current Outstanding</div><div class="stat-value ${latestOut<=0?'green':'gold'}">${latestOut<=0?'PAID ✓':fmtMoney(latestOut)}</div></div>` : '';
-    content.innerHTML = `
+    const allDates=Object.keys(daily).filter(d=>daily[d][name]).sort();
+    const latestOut=allDates.length?(daily[allDates[allDates.length-1]][name].outstanding||0):0;
+    const os=state.role==='owner'?`
+        <div class="stat-cell"><div class="stat-label">Total Paid</div><div class="stat-value green">${fmtMoney(tot.paid)}</div></div>
+        <div class="stat-cell accent span2"><div class="stat-label">Current Outstanding</div>
+            <div class="stat-value ${latestOut<=0?'green':'gold'}">${latestOut<=0?'PAID ✓':fmtMoney(latestOut)}</div></div>`:'';
+    content.innerHTML=`
         <div class="card-premium">
-            <div class="hero"><div class="hero-label">Total Business</div><div class="hero-value">${fmtMoney(totals.dayTotal)}</div></div>
+            <div class="hero"><div class="hero-label">Total Business</div><div class="hero-value">${fmtMoney(tot.dt)}</div></div>
             <div class="gold-rule"></div>
             <div class="stat-grid">
-                <div class="stat-cell"><div class="stat-label">Small</div><div class="stat-value">${totals.smallQty} pcs<br>${fmtMoney(totals.smallAmt)}</div></div>
-                <div class="stat-cell"><div class="stat-label">Large</div><div class="stat-value">${totals.largeQty} pcs<br>${fmtMoney(totals.largeAmt)}</div></div>
-                <div class="stat-cell"><div class="stat-label">Burger</div><div class="stat-value">${totals.burgerQty} pcs<br>${fmtMoney(totals.burgerAmt)}</div></div>
-                <div class="stat-cell"><div class="stat-label">Butter</div><div class="stat-value">${totals.butterQty} pcs<br>${fmtMoney(totals.butterAmt)}</div></div>
-                <div class="stat-cell"><div class="stat-label">Mayo</div><div class="stat-value">${totals.mayoQty} pcs<br>${fmtMoney(totals.mayoAmt)}</div></div>
-                <div class="stat-cell"><div class="stat-label">Rent</div><div class="stat-value">${fmtMoney(totals.rent)}</div></div>
-                ${ownerSummary}
+                <div class="stat-cell"><div class="stat-label">Small</div><div class="stat-value">${tot.ssq} pcs<br>${fmtMoney(tot.ssA)}</div></div>
+                <div class="stat-cell"><div class="stat-label">Large</div><div class="stat-value">${tot.slq} pcs<br>${fmtMoney(tot.slA)}</div></div>
+                <div class="stat-cell"><div class="stat-label">Burger</div><div class="stat-value">${tot.bq} pcs<br>${fmtMoney(tot.bA)}</div></div>
+                <div class="stat-cell"><div class="stat-label">Butter</div><div class="stat-value">${tot.bpq} pcs<br>${fmtMoney(tot.bpA)}</div></div>
+                <div class="stat-cell"><div class="stat-label">Mayo</div><div class="stat-value">${tot.mq} pcs<br>${fmtMoney(tot.mA)}</div></div>
+                <div class="stat-cell"><div class="stat-label">Rent</div><div class="stat-value">${fmtMoney(tot.rent)}</div></div>
+                ${os}
             </div>
             <button class="btn btn-primary" style="margin-top:14px" onclick="generateBill('${name}','${from}','${to}')">📄 Generate Bill</button>
         </div>
-        <div class="card-label" style="margin-bottom:8px">📋 Entries — ${dates.length} days</div>${entryCards}`;
+        <div class="card-label" style="margin-bottom:8px">📋 ${dates.length} Entries</div>${cards}`;
 }
 
-/* ================================================================
-   OUTSTANDING
-================================================================ */
-function renderOutstanding() {
-    const daily  = state.data.daily;
-    const listEl = document.getElementById('outstanding-list');
-    const items  = [];
-    for (const name of Object.keys(state.data.customers)) {
-        const entrDates = Object.keys(daily).filter(d => daily[d][name]).sort();
-        let amount = 0, label = 'No entries yet';
-        if (entrDates.length) { amount = daily[entrDates[entrDates.length-1]][name].outstanding||0; label = entrDates[entrDates.length-1]; }
-        else amount = state.data.customers[name].opening_outstanding || 0;
-        if (amount > 0) items.push({ name, label, amount });
-    }
-    if (!items.length) { listEl.innerHTML = '<div class="all-clear">✓ All Accounts Clear</div>'; return; }
-    items.sort((a,b) => b.amount - a.amount);
-    listEl.innerHTML = items.map(i =>
-        `<div class="list-row"><div><div class="row-title">${i.name}</div><div class="row-sub">${i.label}</div></div>
-         <span class="badge badge-gold">${fmtMoney(i.amount)}</span></div>`).join('');
-}
-
-/* ================================================================
-   DAILY SUMMARY
-================================================================ */
-function renderDailySummary() {
-    const date    = v('sum-date');
-    const entries = state.data.daily[date];
-    const content = document.getElementById('summary-content');
-    if (!entries || !Object.keys(entries).length) { showToast('No entries for this date'); content.innerHTML=''; return; }
-    let t = { small:0,large:0,burger:0,butter:0,mayo:0,rent:0,paid:0,out:0,total:0 };
-    const rows = Object.entries(entries).map(([name,e]) => {
-        t.small+=e.shawarma_small_total||0; t.large+=e.shawarma_large_total||0;
-        t.burger+=e.burger_total||0; t.butter+=e.butter_total||0; t.mayo+=e.mayo_total||0;
-        t.rent+=e.rent||0; t.paid+=e.payment||0; t.out+=Math.max(e.outstanding||0,0); t.total+=e.day_total||0;
-        const out   = e.outstanding||0;
-        const badge = state.role==='owner' ? `<span class="badge ${out<=0?'badge-green':'badge-gold'}">${out<=0?'Paid':fmtMoney(out)}</span>` : '';
-        return `<div class="list-row"><div><div class="row-title">${name}</div>
-                    <div class="row-sub">Small ${fmtMoney(e.shawarma_small_total||0)} · Large ${fmtMoney(e.shawarma_large_total||0)}</div>
-                    <div class="row-sub">Rent ${fmtMoney(e.rent||0)}</div></div>${badge}</div>`;
-    }).join('');
-    const ownerStats = state.role==='owner'
-        ? `<div class="stat-cell"><div class="stat-label">Paid</div><div class="stat-value green">${fmtMoney(t.paid)}</div></div>
-           <div class="stat-cell accent span2"><div class="stat-label">Total Outstanding</div><div class="stat-value gold">${fmtMoney(t.out)}</div></div>` : '';
-    content.innerHTML = `
-        <div class="card-premium">
-            <div class="hero"><div class="hero-label">Total Revenue — ${date}</div><div class="hero-value">${fmtMoney(t.total)}</div></div>
-            <div class="gold-rule"></div>
-            <div class="stat-grid">
-                <div class="stat-cell"><div class="stat-label">Small</div><div class="stat-value">${fmtMoney(t.small)}</div></div>
-                <div class="stat-cell"><div class="stat-label">Large</div><div class="stat-value">${fmtMoney(t.large)}</div></div>
-                <div class="stat-cell"><div class="stat-label">Burger</div><div class="stat-value">${fmtMoney(t.burger)}</div></div>
-                <div class="stat-cell"><div class="stat-label">Butter</div><div class="stat-value">${fmtMoney(t.butter)}</div></div>
-                <div class="stat-cell"><div class="stat-label">Mayo</div><div class="stat-value">${fmtMoney(t.mayo)}</div></div>
-                <div class="stat-cell"><div class="stat-label">Rent</div><div class="stat-value">${fmtMoney(t.rent)}</div></div>
-                ${ownerStats}
+function buildPaymentList() {
+    const date=document.getElementById('pay-date').value;
+    const container=document.getElementById('payment-list');
+    const names=Object.keys(state.data.customers);
+    if(!names.length){container.innerHTML='<div class="empty-state">No customers yet</div>';return;}
+    const existing=state.data.daily[date]||{};
+    container.innerHTML=names.map(name=>{
+        const e=existing[name]||{};
+        const po=getPrevOutstanding(name,date);
+        const out=e.outstanding!==undefined?e.outstanding:po;
+        const outColor=out<=0?'var(--green)':'var(--gold-light)';
+        return `<div class="quick-card ${(e.payment||0)>0?'has-data':''}">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <div class="quick-name">${name}</div>
+                <div style="font-size:11px;color:${outColor};font-weight:600;">${out<=0?'PAID ✓':'Due: '+fmtMoney(out)}</div>
             </div>
-        </div>
-        <div class="card">${rows}</div>`;
-}
-
-/* ================================================================
-   MONTHLY REPORT
-================================================================ */
-function renderMonthlyReport() {
-    const year   = document.getElementById('mon-year').value;
-    const month  = document.getElementById('mon-month').value;
-    const prefix = `${year}-${month}`;
-    const daily  = state.data.daily;
-    const content= document.getElementById('monthly-content');
-    const monthDates = Object.keys(daily).filter(d => d.startsWith(prefix)).sort();
-    if (!monthDates.length) { showToast('No data for this month'); content.innerHTML=''; return; }
-    const totals = {};
-    let pt = { small:0,large:0,burger:0,butter:0,mayo:0,rent:0 };
-    for (const d of monthDates) {
-        for (const [name,e] of Object.entries(daily[d])) {
-            if (!totals[name]) totals[name]={small:0,large:0,burger:0,butter:0,mayo:0,rent:0,paid:0};
-            totals[name].small+=e.shawarma_small_total||0; totals[name].large+=e.shawarma_large_total||0;
-            totals[name].burger+=e.burger_total||0; totals[name].butter+=e.butter_total||0;
-            totals[name].mayo+=e.mayo_total||0; totals[name].rent+=e.rent||0; totals[name].paid+=e.payment||0;
-            pt.small+=e.shawarma_small_total||0; pt.large+=e.shawarma_large_total||0;
-            pt.burger+=e.burger_total||0; pt.butter+=e.butter_total||0;
-            pt.mayo+=e.mayo_total||0; pt.rent+=e.rent||0;
-        }
-    }
-    let grand = { total:0,paid:0,out:0 };
-    const rows = Object.entries(totals).map(([name,t]) => {
-        const custTotal = t.small+t.large+t.burger+t.butter+t.mayo+t.rent;
-        grand.total+=custTotal; grand.paid+=t.paid;
-        const lastDate = monthDates.filter(d => daily[d][name]).sort().pop();
-        const out = lastDate ? (daily[lastDate][name].outstanding||0) : 0;
-        if (out>0) grand.out+=out;
-        const badge = state.role==='owner' ? `<span class="badge ${out<=0?'badge-green':'badge-gold'}">${out<=0?'Paid':fmtMoney(out)}</span>` : '';
-        return `<div class="list-row"><div><div class="row-title">${name}</div>
-                    <div class="row-sub">Total: ${fmtMoney(custTotal)} · Rent: ${fmtMoney(t.rent)}</div></div>${badge}</div>`;
-    }).join('');
-    const ownerStats = state.role==='owner'
-        ? `<div class="stat-cell"><div class="stat-label">Paid</div><div class="stat-value green">${fmtMoney(grand.paid)}</div></div>
-           <div class="stat-cell accent span2"><div class="stat-label">Outstanding</div><div class="stat-value gold">${fmtMoney(grand.out)}</div></div>` : '';
-    content.innerHTML = `
-        <div class="card-premium">
-            <div class="hero"><div class="hero-label">Monthly Revenue</div><div class="hero-value">${fmtMoney(grand.total)}</div></div>
-            <div class="gold-rule"></div>
-            <div class="stat-grid">
-                <div class="stat-cell"><div class="stat-label">Small</div><div class="stat-value">${fmtMoney(pt.small)}</div></div>
-                <div class="stat-cell"><div class="stat-label">Large</div><div class="stat-value">${fmtMoney(pt.large)}</div></div>
-                <div class="stat-cell"><div class="stat-label">Burger</div><div class="stat-value">${fmtMoney(pt.burger)}</div></div>
-                <div class="stat-cell"><div class="stat-label">Butter</div><div class="stat-value">${fmtMoney(pt.butter)}</div></div>
-                <div class="stat-cell"><div class="stat-label">Mayo</div><div class="stat-value">${fmtMoney(pt.mayo)}</div></div>
-                <div class="stat-cell"><div class="stat-label">Rent</div><div class="stat-value">${fmtMoney(pt.rent)}</div></div>
-                ${ownerStats}
+            <div class="quick-field">
+                <div class="quick-field-label">💵 Payment Received</div>
+                <input type="number" class="quick-input payment" data-customer="${name}" value="${e.payment||''}" placeholder="0" style="font-size:16px;padding:10px;">
             </div>
-        </div>
-        <div class="card">${rows}</div>`;
-}
-
-/* ================================================================
-   HISTORY
-================================================================ */
-function renderHistory() {
-    const date    = v('hist-date');
-    const entries = state.data.daily[date];
-    const content = document.getElementById('history-content');
-    if (!entries || !Object.keys(entries).length) { showToast('No entries for this date'); content.innerHTML=''; return; }
-    const rows = Object.entries(entries).map(([name,e]) => {
-        const out   = e.outstanding||0;
-        const badge = state.role==='owner' ? `<span class="badge ${out<=0?'badge-green':'badge-gold'}">${out<=0?'Paid':fmtMoney(out)}</span>` : '';
-        const payInfo = state.role==='owner' ? `<div class="row-sub">Prev: ${fmtMoney(e.prev_outstanding||0)} · Paid: ${fmtMoney(e.payment||0)}</div>` : '';
-        return `<div class="list-row"><div><div class="row-title">${name}</div>
-                    <div class="row-sub">Small ${fmtMoney(e.shawarma_small_total||0)} · Burger ${fmtMoney(e.burger_total||0)}</div>
-                    <div class="row-sub">Day Total: ${fmtMoney(e.day_total||0)}</div>${payInfo}</div>${badge}</div>`;
-    }).join('');
-    content.innerHTML = `<div class="card">${rows}</div>`;
-}
-
-/* ================================================================
-   BILL GENERATION — BEAUTIFUL DESIGN
-================================================================ */
-function generateBill(name, from, to) {
-    const daily = state.data.daily;
-    const dates = Object.keys(daily).filter(d => daily[d][name] !== undefined && d >= from && d <= to).sort();
-    if (!dates.length) { showToast('No entries in this period'); return; }
-
-    state.currentBillName = name;
-    state.currentBillFrom = from;
-    state.currentBillTo   = to;
-
-    // Detect which columns are needed
-    const cols = {
-        small:  dates.some(d => (daily[d][name].shawarma_small_qty  ||0) > 0),
-        large:  dates.some(d => (daily[d][name].shawarma_large_qty  ||0) > 0),
-        burger: dates.some(d => (daily[d][name].burger_qty           ||0) > 0),
-        butter: dates.some(d => (daily[d][name].butter_qty           ||0) > 0),
-        mayo:   dates.some(d => (daily[d][name].mayo_qty             ||0) > 0),
-        rent:   dates.some(d => (daily[d][name].rent                 ||0) > 0),
-    };
-
-    // Build header columns
-    let th = `<th style="text-align:left;padding:10px 8px;background:#1a0e00;color:#E8C97A;font-size:10px;letter-spacing:1px;border:1px solid #3a2800;">DATE</th>`;
-    if (cols.small)  th += `<th style="padding:10px 6px;background:#1a0e00;color:#E8C97A;font-size:10px;letter-spacing:1px;border:1px solid #3a2800;">SMALL</th>`;
-    if (cols.large)  th += `<th style="padding:10px 6px;background:#1a0e00;color:#E8C97A;font-size:10px;letter-spacing:1px;border:1px solid #3a2800;">LARGE</th>`;
-    if (cols.burger) th += `<th style="padding:10px 6px;background:#1a0e00;color:#E8C97A;font-size:10px;letter-spacing:1px;border:1px solid #3a2800;">BURGER</th>`;
-    if (cols.butter) th += `<th style="padding:10px 6px;background:#1a0e00;color:#E8C97A;font-size:10px;letter-spacing:1px;border:1px solid #3a2800;">BUTTER</th>`;
-    if (cols.mayo)   th += `<th style="padding:10px 6px;background:#1a0e00;color:#E8C97A;font-size:10px;letter-spacing:1px;border:1px solid #3a2800;">MAYO</th>`;
-    if (cols.rent)   th += `<th style="padding:10px 6px;background:#1a0e00;color:#E8C97A;font-size:10px;letter-spacing:1px;border:1px solid #3a2800;">RENT</th>`;
-    th += `<th style="text-align:right;padding:10px 8px;background:#1a0e00;color:#E8C97A;font-size:10px;letter-spacing:1px;border:1px solid #3a2800;">TOTAL</th>`;
-
-    // Build rows + calculate totals
-    let totals = { small:0,large:0,burger:0,butter:0,mayo:0,rent:0,grand:0 };
-    let tbody   = '';
-    let rowIdx  = 0;
-
-    ;[...dates].reverse().forEach(d => {
-        const e    = daily[d][name];
-        const bg   = rowIdx % 2 === 0 ? '#fffdf5' : '#fff8e8';
-        rowIdx++;
-        let td = `<td style="padding:8px;border:1px solid #e8d5a0;background:${bg};font-size:11px;font-weight:600;color:#2a1a00;">${d}</td>`;
-        if (cols.small)  { td += `<td style="padding:8px;border:1px solid #e8d5a0;background:${bg};text-align:center;font-size:11px;color:#1a0e00;">${e.shawarma_small_qty||''}</td>`;  totals.small  += e.shawarma_small_qty  ||0; }
-        if (cols.large)  { td += `<td style="padding:8px;border:1px solid #e8d5a0;background:${bg};text-align:center;font-size:11px;color:#1a0e00;">${e.shawarma_large_qty||''}</td>`;  totals.large  += e.shawarma_large_qty  ||0; }
-        if (cols.burger) { td += `<td style="padding:8px;border:1px solid #e8d5a0;background:${bg};text-align:center;font-size:11px;color:#1a0e00;">${e.burger_qty||''}</td>`;           totals.burger += e.burger_qty           ||0; }
-        if (cols.butter) { td += `<td style="padding:8px;border:1px solid #e8d5a0;background:${bg};text-align:center;font-size:11px;color:#1a0e00;">${e.butter_qty||''}</td>`;           totals.butter += e.butter_qty           ||0; }
-        if (cols.mayo)   { td += `<td style="padding:8px;border:1px solid #e8d5a0;background:${bg};text-align:center;font-size:11px;color:#1a0e00;">${e.mayo_qty||''}</td>`;             totals.mayo   += e.mayo_qty             ||0; }
-        if (cols.rent)   { td += `<td style="padding:8px;border:1px solid #e8d5a0;background:${bg};text-align:center;font-size:11px;color:#1a0e00;">${e.rent?Math.round(e.rent):''}</td>`;totals.rent += e.rent||0; }
-        td += `<td style="padding:8px;border:1px solid #e8d5a0;background:${bg};text-align:right;font-size:11px;font-weight:700;color:#8B6914;">${Math.round(e.day_total||0).toLocaleString('en-PK')}</td>`;
-        totals.grand += e.day_total||0;
-        tbody += `<tr>${td}</tr>`;
-    });
-
-    // Summary rows
-    let summaryRows = '';
-    if (cols.small)  summaryRows += `<tr><td style="padding:7px 12px;border:1px solid #e8d5a0;color:#2a1a00;font-size:11px;">Shawarma Small</td><td style="padding:7px 12px;border:1px solid #e8d5a0;text-align:right;font-size:11px;color:#2a1a00;">${totals.small} pcs</td></tr>`;
-    if (cols.large)  summaryRows += `<tr><td style="padding:7px 12px;border:1px solid #e8d5a0;color:#2a1a00;font-size:11px;">Shawarma Large</td><td style="padding:7px 12px;border:1px solid #e8d5a0;text-align:right;font-size:11px;color:#2a1a00;">${totals.large} pcs</td></tr>`;
-    if (cols.burger) summaryRows += `<tr><td style="padding:7px 12px;border:1px solid #e8d5a0;color:#2a1a00;font-size:11px;">Burger</td><td style="padding:7px 12px;border:1px solid #e8d5a0;text-align:right;font-size:11px;color:#2a1a00;">${totals.burger} pcs</td></tr>`;
-    if (cols.butter) summaryRows += `<tr><td style="padding:7px 12px;border:1px solid #e8d5a0;color:#2a1a00;font-size:11px;">Butter Paper</td><td style="padding:7px 12px;border:1px solid #e8d5a0;text-align:right;font-size:11px;color:#2a1a00;">${totals.butter} pcs</td></tr>`;
-    if (cols.mayo)   summaryRows += `<tr><td style="padding:7px 12px;border:1px solid #e8d5a0;color:#2a1a00;font-size:11px;">Mayonnaise</td><td style="padding:7px 12px;border:1px solid #e8d5a0;text-align:right;font-size:11px;color:#2a1a00;">${totals.mayo} pcs</td></tr>`;
-    if (cols.rent)   summaryRows += `<tr><td style="padding:7px 12px;border:1px solid #e8d5a0;color:#2a1a00;font-size:11px;">Total Rent</td><td style="padding:7px 12px;border:1px solid #e8d5a0;text-align:right;font-size:11px;color:#2a1a00;">Rs ${Math.round(totals.rent).toLocaleString('en-PK')}</td></tr>`;
-
-    // Outstanding
-    const latestDate  = dates[dates.length - 1];
-    const latestEntry = daily[latestDate][name];
-    const outstanding = latestEntry.outstanding || 0;
-    const outRows = state.role === 'owner'
-        ? `<tr style="background:#f0fff8;">
-               <td style="padding:8px 12px;border:1px solid #c8e8d8;color:#1a5a35;font-size:11px;">Total Paid</td>
-               <td style="padding:8px 12px;border:1px solid #c8e8d8;text-align:right;color:#1a5a35;font-weight:700;font-size:11px;">Rs ${Math.round(latestEntry.payment||0).toLocaleString('en-PK')}</td>
-           </tr>
-           <tr style="background:${outstanding<=0?'#e8fff4':'#fff3e8'};">
-               <td style="padding:10px 12px;border:2px solid ${outstanding<=0?'#4CAF82':'#C9A84C'};font-weight:800;font-size:13px;color:${outstanding<=0?'#1a5a35':'#6b3a00'};">OUTSTANDING</td>
-               <td style="padding:10px 12px;border:2px solid ${outstanding<=0?'#4CAF82':'#C9A84C'};text-align:right;font-weight:800;font-size:13px;color:${outstanding<=0?'#1a5a35':'#8B6914'};">${outstanding<=0?'✓ PAID':'Rs '+Math.round(outstanding).toLocaleString('en-PK')}</td>
-           </tr>` : '';
-
-    const billHTML = `
-        <div id="bill-content" style="background:#fffdf5;max-width:580px;margin:0 auto;font-family:Georgia,serif;">
-
-            <!-- Decorative Top Border -->
-            <div style="height:6px;background:linear-gradient(90deg,#8B6914,#C9A84C,#E8C97A,#C9A84C,#8B6914);"></div>
-
-            <!-- Header -->
-            <div style="text-align:center;padding:24px 20px 18px;background:linear-gradient(180deg,#1a0e00 0%,#2d1a00 100%);">
-                <div style="font-size:10px;letter-spacing:8px;color:#C9A84C;text-transform:uppercase;margin-bottom:10px;">✦ &nbsp; ✦ &nbsp; ✦</div>
-                <div style="font-size:30px;font-weight:900;letter-spacing:8px;color:#F5E6C0;text-transform:uppercase;text-shadow:0 2px 8px rgba(0,0,0,0.5);">M.A BAKERS</div>
-                <div style="width:60px;height:2px;background:linear-gradient(90deg,transparent,#C9A84C,transparent);margin:10px auto;"></div>
-                <div style="font-size:12px;letter-spacing:6px;color:#C9A84C;text-transform:uppercase;">S H A W A R M A</div>
-                <div style="font-size:10px;letter-spacing:8px;color:#8B6914;text-transform:uppercase;margin-top:10px;">✦ &nbsp; ✦ &nbsp; ✦</div>
-            </div>
-
-            <!-- Gold Rule -->
-            <div style="height:3px;background:linear-gradient(90deg,#8B6914,#E8C97A,#8B6914);"></div>
-
-            <!-- Bill Info -->
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:#fff8e8;border-bottom:1px solid #e8d5a0;">
-                <div>
-                    <div style="font-size:9px;color:#8B6914;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Bill To</div>
-                    <div style="font-size:18px;font-weight:800;color:#1a0e00;letter-spacing:0.5px;">${name}</div>
-                </div>
-                <div style="text-align:right;">
-                    <div style="font-size:9px;color:#8B6914;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Issued</div>
-                    <div style="font-size:12px;font-weight:600;color:#1a0e00;">${new Date().toLocaleDateString('en-PK')}</div>
-                </div>
-            </div>
-
-            <!-- Period Banner -->
-            <div style="background:linear-gradient(135deg,#C9A84C,#8B6914);padding:8px 20px;text-align:center;">
-                <span style="font-size:11px;color:white;letter-spacing:3px;font-weight:700;text-transform:uppercase;">
-                    PERIOD &nbsp;·&nbsp; ${from} &nbsp; → &nbsp; ${to}
-                </span>
-            </div>
-
-            <!-- Main Table -->
-            <div style="padding:16px 20px 8px;">
-                <table style="width:100%;border-collapse:collapse;">
-                    <thead><tr>${th}</tr></thead>
-                    <tbody>${tbody}</tbody>
-                </table>
-            </div>
-
-            <!-- Summary Section -->
-            <div style="padding:0 20px 16px;">
-                <div style="border:1px solid #C9A84C;border-radius:6px;overflow:hidden;">
-                    <div style="background:linear-gradient(135deg,#2d1a00,#1a0e00);padding:9px 12px;">
-                        <span style="color:#E8C97A;font-size:10px;letter-spacing:3px;font-weight:700;text-transform:uppercase;">📋 SUMMARY</span>
-                    </div>
-                    <table style="width:100%;border-collapse:collapse;">
-                        ${summaryRows}
-                        <tr style="background:#fff3d0;">
-                            <td style="padding:10px 12px;border-top:2px solid #C9A84C;font-weight:800;font-size:13px;color:#1a0e00;">Total Amount</td>
-                            <td style="padding:10px 12px;border-top:2px solid #C9A84C;text-align:right;font-weight:800;font-size:14px;color:#8B6914;">Rs ${Math.round(totals.grand).toLocaleString('en-PK')}</td>
-                        </tr>
-                        ${outRows}
-                    </table>
-                </div>
-            </div>
-
-            <!-- Footer -->
-            <div style="padding:16px 20px;border-top:1px solid #e8d5a0;background:#fffdf5;display:flex;justify-content:space-between;align-items:flex-end;">
-                <div style="font-size:9px;color:#8B6914;line-height:1.8;">
-                    <div>Generated: ${new Date().toLocaleString('en-PK')}</div>
-                    <div style="font-weight:600;margin-top:2px;">M.A Bakers — Shawarma</div>
-                </div>
-                <div style="text-align:center;">
-                    <div style="width:130px;border-top:1.5px solid #2a1a00;padding-top:4px;font-size:9px;color:#8B6914;letter-spacing:1px;text-transform:uppercase;">Authorised Signature</div>
-                </div>
-            </div>
-
-            <!-- Decorative Bottom Border -->
-            <div style="height:6px;background:linear-gradient(90deg,#8B6914,#C9A84C,#E8C97A,#C9A84C,#8B6914);"></div>
-
         </div>`;
+    }).join('');
+}
 
-    document.getElementById('bill-body').innerHTML = billHTML;
+function commitPayments() {
+    const date=document.getElementById('pay-date').value;
+    const daily=state.data.daily;
+    if(!daily[date]) daily[date]={};
+    let saved=0;
+    document.querySelectorAll('#payment-list .quick-input').forEach(inp=>{
+        const name=inp.dataset.customer, pay=parseFloat(inp.value)||0;
+        const c=state.data.customers[name]; if(!c) return;
+        if(daily[date][name]){
+            daily[date][name].payment=pay;
+            daily[date][name].outstanding=daily[date][name].prev_outstanding+daily[date][name].day_total-pay;
+        } else {
+            if(!pay) return;
+            const po=getPrevOutstanding(name,date);
+            daily[date][name]={
+                shawarma_small_qty:0,shawarma_small_rate:c.shawarma_small_rate||0,shawarma_small_total:0,
+                shawarma_large_qty:0,shawarma_large_rate:c.shawarma_large_rate||0,shawarma_large_total:0,
+                burger_qty:0,burger_rate:c.burger_rate||0,burger_total:0,
+                butter_qty:0,butter_rate:c.butter_rate||0,butter_total:0,
+                mayo_qty:0,mayo_rate:c.mayo_rate||0,mayo_total:0,
+                rent:0,day_total:0,payment:pay,prev_outstanding:po,outstanding:po-pay,
+            };
+        }
+        cascadeRecalc(name,date); saved++;
+    });
+    if(daily[date]&&!Object.keys(daily[date]).length) delete daily[date];
+    persistData();
+    saved>0?showStatus('payment-status',`✓ ${saved} payments saved`,'success')
+           :showStatus('payment-status','No payments entered','warning');
+    buildPaymentList(); renderOutstanding();
+}
+
+function renderOutstanding() {
+    const daily=state.data.daily, listEl=document.getElementById('outstanding-list'), items=[];
+    for(const name of Object.keys(state.data.customers)){
+        const ds=Object.keys(daily).filter(d=>daily[d][name]).sort();
+        let amt=0,lbl='No entries';
+        if(ds.length){amt=daily[ds[ds.length-1]][name].outstanding||0;lbl=ds[ds.length-1];}
+        else amt=state.data.customers[name].opening_outstanding||0;
+        if(amt>0) items.push({name,lbl,amt});
+    }
+    if(!items.length){listEl.innerHTML='<div class="all-clear">✓ All Accounts Clear</div>';return;}
+    items.sort((a,b)=>b.amt-a.amt);
+    listEl.innerHTML=items.map(i=>`<div class="list-row"><div><div class="row-title">${i.name}</div><div class="row-sub">${i.lbl}</div></div><span class="badge badge-gold">${fmtMoney(i.amt)}</span></div>`).join('');
+}
+
+function renderDailySummary() {
+    const date=v('sum-date'), entries=state.data.daily[date], content=document.getElementById('summary-content');
+    if(!entries||!Object.keys(entries).length){showToast('No entries for this date');content.innerHTML='';return;}
+    let t={s:0,l:0,b:0,bp:0,m:0,rent:0,paid:0,out:0,total:0};
+    const rows=Object.entries(entries).map(([name,e])=>{
+        t.s+=e.shawarma_small_total||0;t.l+=e.shawarma_large_total||0;
+        t.b+=e.burger_total||0;t.bp+=e.butter_total||0;t.m+=e.mayo_total||0;
+        t.rent+=e.rent||0;t.paid+=e.payment||0;t.out+=Math.max(e.outstanding||0,0);t.total+=e.day_total||0;
+        const out=e.outstanding||0;
+        const badge=state.role==='owner'?`<span class="badge ${out<=0?'badge-green':'badge-gold'}">${out<=0?'Paid':fmtMoney(out)}</span>`:'';
+        return `<div class="list-row"><div><div class="row-title">${name}</div>
+            <div class="row-sub">Small ${fmtMoney(e.shawarma_small_total||0)} · Large ${fmtMoney(e.shawarma_large_total||0)}</div>
+            <div class="row-sub">Day Total: ${fmtMoney(e.day_total||0)}</div></div>${badge}</div>`;
+    }).join('');
+    const os=state.role==='owner'?`<div class="stat-cell"><div class="stat-label">Paid</div><div class="stat-value green">${fmtMoney(t.paid)}</div></div>
+        <div class="stat-cell accent span2"><div class="stat-label">Outstanding</div><div class="stat-value gold">${fmtMoney(t.out)}</div></div>`:'';
+    content.innerHTML=`<div class="card-premium"><div class="hero"><div class="hero-label">Total Revenue — ${date}</div><div class="hero-value">${fmtMoney(t.total)}</div></div>
+        <div class="gold-rule"></div><div class="stat-grid">
+        <div class="stat-cell"><div class="stat-label">Small</div><div class="stat-value">${fmtMoney(t.s)}</div></div>
+        <div class="stat-cell"><div class="stat-label">Large</div><div class="stat-value">${fmtMoney(t.l)}</div></div>
+        <div class="stat-cell"><div class="stat-label">Burger</div><div class="stat-value">${fmtMoney(t.b)}</div></div>
+        <div class="stat-cell"><div class="stat-label">Butter</div><div class="stat-value">${fmtMoney(t.bp)}</div></div>
+        <div class="stat-cell"><div class="stat-label">Mayo</div><div class="stat-value">${fmtMoney(t.m)}</div></div>
+        <div class="stat-cell"><div class="stat-label">Rent</div><div class="stat-value">${fmtMoney(t.rent)}</div></div>${os}</div></div>
+        <div class="card">${rows}</div>`;
+}
+
+function renderMonthlyReport() {
+    const yr=document.getElementById('mon-year').value, mo=document.getElementById('mon-month').value;
+    const prefix=yr+'-'+mo, daily=state.data.daily, content=document.getElementById('monthly-content');
+    const mDates=Object.keys(daily).filter(d=>d.startsWith(prefix)).sort();
+    if(!mDates.length){showToast('No data for this month');content.innerHTML='';return;}
+    const tot={}, pt={s:0,l:0,b:0,bp:0,m:0,rent:0};
+    for(const d of mDates) for(const[name,e] of Object.entries(daily[d])){
+        if(!tot[name]) tot[name]={s:0,l:0,b:0,bp:0,m:0,rent:0,paid:0};
+        tot[name].s+=e.shawarma_small_total||0; tot[name].l+=e.shawarma_large_total||0;
+        tot[name].b+=e.burger_total||0; tot[name].bp+=e.butter_total||0;
+        tot[name].m+=e.mayo_total||0; tot[name].rent+=e.rent||0; tot[name].paid+=e.payment||0;
+        pt.s+=e.shawarma_small_total||0; pt.l+=e.shawarma_large_total||0;
+        pt.b+=e.burger_total||0; pt.bp+=e.butter_total||0; pt.m+=e.mayo_total||0; pt.rent+=e.rent||0;
+    }
+    let grand={total:0,paid:0,out:0};
+    const rows=Object.entries(tot).map(([name,t])=>{
+        const ct=t.s+t.l+t.b+t.bp+t.m+t.rent; grand.total+=ct; grand.paid+=t.paid;
+        const ld=mDates.filter(d=>daily[d][name]).sort().pop();
+        const out=ld?(daily[ld][name].outstanding||0):0; if(out>0) grand.out+=out;
+        const badge=state.role==='owner'?`<span class="badge ${out<=0?'badge-green':'badge-gold'}">${out<=0?'Paid':fmtMoney(out)}</span>`:'';
+        return `<div class="list-row"><div><div class="row-title">${name}</div>
+            <div class="row-sub">Total: ${fmtMoney(ct)} · Rent: ${fmtMoney(t.rent)}</div></div>${badge}</div>`;
+    }).join('');
+    const os=state.role==='owner'?`<div class="stat-cell"><div class="stat-label">Paid</div><div class="stat-value green">${fmtMoney(grand.paid)}</div></div>
+        <div class="stat-cell accent span2"><div class="stat-label">Outstanding</div><div class="stat-value gold">${fmtMoney(grand.out)}</div></div>`:'';
+    content.innerHTML=`<div class="card-premium"><div class="hero"><div class="hero-label">Monthly Revenue</div><div class="hero-value">${fmtMoney(grand.total)}</div></div>
+        <div class="gold-rule"></div><div class="stat-grid">
+        <div class="stat-cell"><div class="stat-label">Small</div><div class="stat-value">${fmtMoney(pt.s)}</div></div>
+        <div class="stat-cell"><div class="stat-label">Large</div><div class="stat-value">${fmtMoney(pt.l)}</div></div>
+        <div class="stat-cell"><div class="stat-label">Burger</div><div class="stat-value">${fmtMoney(pt.b)}</div></div>
+        <div class="stat-cell"><div class="stat-label">Butter</div><div class="stat-value">${fmtMoney(pt.bp)}</div></div>
+        <div class="stat-cell"><div class="stat-label">Mayo</div><div class="stat-value">${fmtMoney(pt.m)}</div></div>
+        <div class="stat-cell"><div class="stat-label">Rent</div><div class="stat-value">${fmtMoney(pt.rent)}</div></div>${os}</div></div>
+        <div class="card">${rows}</div>`;
+}
+
+function renderHistory() {
+    const date=v('hist-date'), entries=state.data.daily[date], content=document.getElementById('history-content');
+    if(!entries||!Object.keys(entries).length){showToast('No entries');content.innerHTML='';return;}
+    const rows=Object.entries(entries).map(([name,e])=>{
+        const out=e.outstanding||0;
+        const badge=state.role==='owner'?`<span class="badge ${out<=0?'badge-green':'badge-gold'}">${out<=0?'Paid':fmtMoney(out)}</span>`:'';
+        const pi=state.role==='owner'?`<div class="row-sub">Prev: ${fmtMoney(e.prev_outstanding||0)} · Paid: ${fmtMoney(e.payment||0)}</div>`:'';
+        return `<div class="list-row"><div><div class="row-title">${name}</div>
+            <div class="row-sub">Small ${fmtMoney(e.shawarma_small_total||0)} · Burger ${fmtMoney(e.burger_total||0)}</div>
+            <div class="row-sub">Day Total: ${fmtMoney(e.day_total||0)}</div>${pi}</div>${badge}</div>`;
+    }).join('');
+    content.innerHTML=`<div class="card">${rows}</div>`;
+}
+
+function generateBill(name, from, to) {
+    const daily=state.data.daily;
+    const dates=Object.keys(daily).filter(d=>daily[d][name]!==undefined&&d>=from&&d<=to).sort();
+    if(!dates.length){showToast('No entries');return;}
+    state.currentBillName=name; state.currentBillFrom=from; state.currentBillTo=to;
+    const cols={
+        small: dates.some(d=>(daily[d][name].shawarma_small_qty||0)>0),
+        large: dates.some(d=>(daily[d][name].shawarma_large_qty||0)>0),
+        burger:dates.some(d=>(daily[d][name].burger_qty||0)>0),
+        butter:dates.some(d=>(daily[d][name].butter_qty||0)>0),
+        mayo:  dates.some(d=>(daily[d][name].mayo_qty||0)>0),
+        rent:  dates.some(d=>(daily[d][name].rent||0)>0),
+    };
+    const thStyle='padding:9px 6px;background:#1a0e00;color:#E8C97A;font-size:10px;letter-spacing:1px;border:1px solid #3a2800;';
+    let th=`<th style="${thStyle}text-align:left;">DATE</th>`;
+    if(cols.small)  th+=`<th style="${thStyle}text-align:center;">SMALL</th>`;
+    if(cols.large)  th+=`<th style="${thStyle}text-align:center;">LARGE</th>`;
+    if(cols.burger) th+=`<th style="${thStyle}text-align:center;">BURGER</th>`;
+    if(cols.butter) th+=`<th style="${thStyle}text-align:center;">BUTTER</th>`;
+    if(cols.mayo)   th+=`<th style="${thStyle}text-align:center;">MAYO</th>`;
+    if(cols.rent)   th+=`<th style="${thStyle}text-align:center;">RENT</th>`;
+    th+=`<th style="${thStyle}text-align:right;">TOTAL</th>`;
+    let totals={s:0,l:0,b:0,bp:0,m:0,rent:0,grand:0}, tbody='', ri=0;
+    dates.forEach(d=>{
+        const e=daily[d][name], bg=ri++%2===0?'#fffdf5':'#fff8e8';
+        const tdS=`padding:8px;border:1px solid #e8d5a0;background:${bg};font-size:11px;`;
+        let td=`<td style="${tdS}font-weight:600;color:#2a1a00;">${d}</td>`;
+        if(cols.small)  {td+=`<td style="${tdS}text-align:center;color:#1a0e00;">${e.shawarma_small_qty||''}</td>`;  totals.s+=e.shawarma_small_qty||0;}
+        if(cols.large)  {td+=`<td style="${tdS}text-align:center;color:#1a0e00;">${e.shawarma_large_qty||''}</td>`;  totals.l+=e.shawarma_large_qty||0;}
+        if(cols.burger) {td+=`<td style="${tdS}text-align:center;color:#1a0e00;">${e.burger_qty||''}</td>`;           totals.b+=e.burger_qty||0;}
+        if(cols.butter) {td+=`<td style="${tdS}text-align:center;color:#1a0e00;">${e.butter_qty||''}</td>`;           totals.bp+=e.butter_qty||0;}
+        if(cols.mayo)   {td+=`<td style="${tdS}text-align:center;color:#1a0e00;">${e.mayo_qty||''}</td>`;             totals.m+=e.mayo_qty||0;}
+        if(cols.rent)   {td+=`<td style="${tdS}text-align:center;color:#1a0e00;">${e.rent?Math.round(e.rent):''}</td>`;totals.rent+=e.rent||0;}
+        td+=`<td style="${tdS}text-align:right;font-weight:700;color:#8B6914;">${Math.round(e.day_total||0).toLocaleString('en-PK')}</td>`;
+        totals.grand+=e.day_total||0; tbody+=`<tr>${td}</tr>`;
+    });
+    let sumRows='';
+    if(cols.small)  sumRows+=`<tr><td style="padding:7px 12px;border:1px solid #e8d5a0;color:#2a1a00;font-size:11px;">Shawarma Small</td><td style="padding:7px 12px;border:1px solid #e8d5a0;text-align:right;font-size:11px;">${totals.s} pcs</td></tr>`;
+    if(cols.large)  sumRows+=`<tr><td style="padding:7px 12px;border:1px solid #e8d5a0;color:#2a1a00;font-size:11px;">Shawarma Large</td><td style="padding:7px 12px;border:1px solid #e8d5a0;text-align:right;font-size:11px;">${totals.l} pcs</td></tr>`;
+    if(cols.burger) sumRows+=`<tr><td style="padding:7px 12px;border:1px solid #e8d5a0;color:#2a1a00;font-size:11px;">Burger</td><td style="padding:7px 12px;border:1px solid #e8d5a0;text-align:right;font-size:11px;">${totals.b} pcs</td></tr>`;
+    if(cols.butter) sumRows+=`<tr><td style="padding:7px 12px;border:1px solid #e8d5a0;color:#2a1a00;font-size:11px;">Butter Paper</td><td style="padding:7px 12px;border:1px solid #e8d5a0;text-align:right;font-size:11px;">${totals.bp} pcs</td></tr>`;
+    if(cols.mayo)   sumRows+=`<tr><td style="padding:7px 12px;border:1px solid #e8d5a0;color:#2a1a00;font-size:11px;">Mayonnaise</td><td style="padding:7px 12px;border:1px solid #e8d5a0;text-align:right;font-size:11px;">${totals.m} pcs</td></tr>`;
+    if(cols.rent)   sumRows+=`<tr><td style="padding:7px 12px;border:1px solid #e8d5a0;color:#2a1a00;font-size:11px;">Total Rent</td><td style="padding:7px 12px;border:1px solid #e8d5a0;text-align:right;font-size:11px;">Rs ${Math.round(totals.rent).toLocaleString('en-PK')}</td></tr>`;
+    const latestEntry=daily[dates[dates.length-1]][name];
+    const outstanding=latestEntry.outstanding||0;
+    const outRows=state.role==='owner'?`
+        <tr style="background:#f0fff8;"><td style="padding:8px 12px;border:1px solid #c8e8d8;color:#1a5a35;font-size:11px;">Total Paid</td>
+            <td style="padding:8px 12px;border:1px solid #c8e8d8;text-align:right;color:#1a5a35;font-weight:700;font-size:11px;">Rs ${Math.round(latestEntry.payment||0).toLocaleString('en-PK')}</td></tr>
+        <tr style="background:${outstanding<=0?'#e8fff4':'#fff3e8'};"><td style="padding:10px 12px;border:2px solid ${outstanding<=0?'#4CAF82':'#C9A84C'};font-weight:800;font-size:13px;color:#1a0e00;">OUTSTANDING</td>
+            <td style="padding:10px 12px;border:2px solid ${outstanding<=0?'#4CAF82':'#C9A84C'};text-align:right;font-weight:800;font-size:13px;color:${outstanding<=0?'#1a5a35':'#8B6914'};">${outstanding<=0?'✓ PAID':'Rs '+Math.round(outstanding).toLocaleString('en-PK')}</td></tr>`:'';
+    const billHTML=`<div id="bill-content" style="background:#fffdf5;max-width:580px;margin:0 auto;font-family:Georgia,serif;">
+        <div style="height:6px;background:linear-gradient(90deg,#8B6914,#C9A84C,#E8C97A,#C9A84C,#8B6914);"></div>
+        <div style="text-align:center;padding:24px 20px 18px;background:linear-gradient(180deg,#1a0e00 0%,#2d1a00 100%);">
+            <div style="font-size:10px;letter-spacing:8px;color:#C9A84C;margin-bottom:10px;">✦ &nbsp; ✦ &nbsp; ✦</div>
+            <div style="font-size:30px;font-weight:900;letter-spacing:8px;color:#F5E6C0;text-transform:uppercase;">M.A BAKERS</div>
+            <div style="width:60px;height:2px;background:linear-gradient(90deg,transparent,#C9A84C,transparent);margin:10px auto;"></div>
+            <div style="font-size:12px;letter-spacing:6px;color:#C9A84C;text-transform:uppercase;">S H A W A R M A</div>
+            <div style="font-size:10px;letter-spacing:8px;color:#8B6914;margin-top:10px;">✦ &nbsp; ✦ &nbsp; ✦</div>
+        </div>
+        <div style="height:3px;background:linear-gradient(90deg,#8B6914,#E8C97A,#8B6914);"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:#fff8e8;border-bottom:1px solid #e8d5a0;">
+            <div><div style="font-size:9px;color:#8B6914;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Bill To</div>
+                <div style="font-size:18px;font-weight:800;color:#1a0e00;">${name}</div></div>
+            <div style="text-align:right;"><div style="font-size:9px;color:#8B6914;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Issued</div>
+                <div style="font-size:12px;font-weight:600;color:#1a0e00;">${new Date().toLocaleDateString('en-PK')}</div></div>
+        </div>
+        <div style="background:linear-gradient(135deg,#C9A84C,#8B6914);padding:8px 20px;text-align:center;">
+            <span style="font-size:11px;color:white;letter-spacing:3px;font-weight:700;text-transform:uppercase;">PERIOD &nbsp;·&nbsp; ${from} &nbsp;→&nbsp; ${to}</span>
+        </div>
+        <div style="padding:16px 20px 8px;">
+            <table style="width:100%;border-collapse:collapse;"><thead><tr>${th}</tr></thead><tbody>${tbody}</tbody></table>
+        </div>
+        <div style="padding:0 20px 16px;"><div style="border:1px solid #C9A84C;border-radius:6px;overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#2d1a00,#1a0e00);padding:9px 12px;">
+                <span style="color:#E8C97A;font-size:10px;letter-spacing:3px;font-weight:700;text-transform:uppercase;">📋 SUMMARY</span>
+            </div>
+            <table style="width:100%;border-collapse:collapse;">${sumRows}
+                <tr style="background:#fff3d0;"><td style="padding:10px 12px;border-top:2px solid #C9A84C;font-weight:800;font-size:13px;color:#1a0e00;">Total Amount</td>
+                    <td style="padding:10px 12px;border-top:2px solid #C9A84C;text-align:right;font-weight:800;font-size:14px;color:#8B6914;">Rs ${Math.round(totals.grand).toLocaleString('en-PK')}</td></tr>
+                ${outRows}
+            </table>
+        </div></div>
+        <div style="padding:16px 20px;border-top:1px solid #e8d5a0;background:#fffdf5;display:flex;justify-content:space-between;align-items:flex-end;">
+            <div style="font-size:9px;color:#8B6914;line-height:1.8;">
+                <div>Generated: ${new Date().toLocaleDateString('en-PK')}</div>
+                <div style="font-weight:600;">M.A Bakers — Shawarma</div>
+            </div>
+            <div style="text-align:center;"><div style="width:130px;border-top:1.5px solid #2a1a00;padding-top:4px;font-size:9px;color:#8B6914;letter-spacing:1px;text-transform:uppercase;">Authorised Signature</div></div>
+        </div>
+        <div style="height:6px;background:linear-gradient(90deg,#8B6914,#C9A84C,#E8C97A,#C9A84C,#8B6914);"></div>
+    </div>`;
+    document.getElementById('bill-body').innerHTML=billHTML;
     document.getElementById('bill-overlay').classList.add('show');
 }
 
-function closeBill() {
-    document.getElementById('bill-overlay').classList.remove('show');
-}
+function closeBill() { document.getElementById('bill-overlay').classList.remove('show'); }
 
 function copyBillText() {
-    const text = buildBillText(state.currentBillName, state.currentBillFrom, state.currentBillTo);
+    const text=buildBillText(state.currentBillName,state.currentBillFrom,state.currentBillTo);
     copyText(text);
 }
 
-async function saveAsImage() {
-    const billContent = document.getElementById('bill-content');
-    if (!billContent) { showToast('No bill to save'); return; }
-    showToast('Generating image…');
-    try {
-        const canvas = await html2canvas(billContent, {
-            scale: 2,
-            backgroundColor: '#fffdf5',
-            useCORS: true,
-            logging: false,
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if (window.AndroidBridge && window.AndroidBridge.saveImage) {
-            const base64 = imgData.split(',')[1];
-            window.AndroidBridge.saveImage(base64, `MABakers_${state.currentBillName}_Bill.png`);
-            showToast('✓ Saved to gallery! Share from Photos app');
-        } else {
-            const link = document.createElement('a');
-            link.download = `MABakers_${state.currentBillName}_Bill.png`;
-            link.href = imgData;
-            link.click();
-            showToast('✓ Bill image downloaded!');
-        }
-    } catch(e) {
-        showToast('Could not generate image');
+function saveAsImage() {
+    if(window.AndroidBridge && window.AndroidBridge.captureAndSave) {
+        showToast('Capturing bill...');
+        const name=state.currentBillName||'Bill';
+        window.AndroidBridge.captureAndSave('MABakers_'+name+'_'+Date.now()+'.jpg');
+    } else {
+        showToast('Not supported on this device');
     }
 }
 
-function buildBillText(name, from, to) {
-    const daily = state.data.daily;
-    const dates = Object.keys(daily).filter(d => daily[d][name] !== undefined && d >= from && d <= to).sort();
-    let text  = `*M.A BAKERS — SHAWARMA*\n`;
-    text     += `M/s: ${name}\n`;
-    text     += `Period: ${from} to ${to}\n`;
-    text     += `─────────────────────\n`;
-    let grand = 0;
-    dates.forEach(d => {
-        const e = daily[d][name];
-        let line = `${d}: `;
-        if (e.shawarma_small_qty) line += `Small ${e.shawarma_small_qty} `;
-        if (e.shawarma_large_qty) line += `Large ${e.shawarma_large_qty} `;
-        if (e.burger_qty)         line += `Burger ${e.burger_qty} `;
-        if (e.butter_qty)         line += `Butter ${e.butter_qty} `;
-        if (e.mayo_qty)           line += `Mayo ${e.mayo_qty} `;
-        if (e.rent)               line += `Rent Rs${Math.round(e.rent)} `;
-        line += `= *Rs ${Math.round(e.day_total||0).toLocaleString('en-PK')}*`;
-        text += line + '\n';
-        grand += e.day_total||0;
+function buildBillText(name,from,to) {
+    const daily=state.data.daily;
+    const dates=Object.keys(daily).filter(d=>daily[d][name]!==undefined&&d>=from&&d<=to).sort();
+    let text=`*M.A BAKERS — SHAWARMA*\nM/s: ${name}\nPeriod: ${from} to ${to}\n─────────────────────\n`;
+    let grand=0;
+    dates.forEach(d=>{
+        const e=daily[d][name];
+        let line=`${d}: `;
+        if(e.shawarma_small_qty) line+=`Small ${e.shawarma_small_qty} `;
+        if(e.shawarma_large_qty) line+=`Large ${e.shawarma_large_qty} `;
+        if(e.burger_qty)         line+=`Burger ${e.burger_qty} `;
+        if(e.butter_qty)         line+=`Butter ${e.butter_qty} `;
+        if(e.mayo_qty)           line+=`Mayo ${e.mayo_qty} `;
+        if(e.rent)               line+=`Rent Rs${Math.round(e.rent)} `;
+        line+=`= *Rs ${Math.round(e.day_total||0).toLocaleString('en-PK')}*`;
+        text+=line+'\n'; grand+=e.day_total||0;
     });
-    text += `─────────────────────\n`;
-    text += `*Total: Rs ${Math.round(grand).toLocaleString('en-PK')}*\n`;
-    if (state.role === 'owner') {
-        const latestDate  = dates[dates.length-1];
-        const out = daily[latestDate]?.[name]?.outstanding || 0;
-        text += `*Outstanding: ${out<=0?'PAID ✓':'Rs '+Math.round(out).toLocaleString('en-PK')}*\n`;
+    text+=`─────────────────────\n*Total: Rs ${Math.round(grand).toLocaleString('en-PK')}*\n`;
+    if(state.role==='owner'){
+        const out=daily[dates[dates.length-1]]?.[name]?.outstanding||0;
+        text+=`*Outstanding: ${out<=0?'PAID ✓':'Rs '+Math.round(out).toLocaleString('en-PK')}*\n`;
     }
     return text;
 }
 
 function copyText(text) {
-    const el = document.createElement('textarea');
-    el.value = text;
-    el.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
-    document.body.appendChild(el);
-    el.select();
-    try { document.execCommand('copy'); showToast('✓ Bill copied — paste in WhatsApp'); }
-    catch (_) { showToast('Could not copy'); }
+    const el=document.createElement('textarea');
+    el.value=text; el.style.cssText='position:fixed;opacity:0;top:0;left:0;';
+    document.body.appendChild(el); el.select();
+    try{document.execCommand('copy');showToast('✓ Copied — paste in WhatsApp');}
+    catch(_){showToast('Could not copy');}
     document.body.removeChild(el);
 }
 
-/* ================================================================
-   INIT
-================================================================ */
 function initDates() {
-    const t   = todayISO();
-    const now = new Date();
-    set('quick-date',  t);
-    set('detail-date', t);
-    set('sum-date',    t);
-    set('hist-date',   t);
-    set('ch-from',     firstOfMonth());
-    set('ch-to',       t);
-    set('mon-year',    now.getFullYear());
-    set('mon-month',   String(now.getMonth()+1).padStart(2,'0'));
+    const t=todayISO(), now=new Date();
+    set('quick-date',t); set('detail-date',t); set('sum-date',t); set('hist-date',t);
+    set('ch-from',firstOfMonth()); set('ch-to',t); set('pay-date',t);
+    set('mon-year',now.getFullYear());
+    set('mon-month',String(now.getMonth()+1).padStart(2,'0'));
 }
 
 function initSplash() {
-    setTimeout(() => {
+    setTimeout(()=>{
         document.getElementById('splash-ring').classList.add('show');
         document.getElementById('splash-title').classList.add('show');
         document.getElementById('splash-sub').classList.add('show');
         document.getElementById('splash-line').classList.add('show');
-    }, 100);
-    setTimeout(() => {
-        const splash = document.getElementById('splash');
-        splash.style.transition = 'opacity 0.8s ease';
-        splash.style.opacity    = '0';
-        setTimeout(() => {
+    },100);
+    setTimeout(()=>{
+        const splash=document.getElementById('splash');
+        splash.style.transition='opacity 0.8s ease';
+        splash.style.opacity='0';
+        setTimeout(()=>{
             splash.remove();
-            const savedRole = localStorage.getItem('ma_role');
-            const validRoles = Object.values(PASSWORDS);
-            if (savedRole && validRoles.includes(savedRole)) {
-                state.role = savedRole;
-                applyRole();
-                startAutoSync();
-                buildQuickList();
+            const saved=localStorage.getItem('ma_role');
+            if(saved && Object.values(PASSWORDS).includes(saved)){
+                state.role=saved; applyRole(); startAutoSync(); buildQuickList();
             } else {
                 document.getElementById('login-screen').classList.remove('hidden');
             }
-        }, 800);
-    }, 3000);
+        },800);
+    },3000);
 }
 
 /* Bootstrap */
@@ -1394,7 +1233,7 @@ loadData();
 initDates();
 renderCustomerList();
 renderOutstanding();
-document.getElementById('login-input').addEventListener('keydown', e => { if (e.key==='Enter') handleLogin(); });
+document.getElementById('login-input').addEventListener('keydown', e=>{if(e.key==='Enter') handleLogin();});
 initSplash();
 </script>
 </body>
