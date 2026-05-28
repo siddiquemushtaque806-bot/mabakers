@@ -1,0 +1,2505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MA Bakers">
+    <title>MA Bakers</title>
+    <style>
+        /* ============================================================
+           RESET & ROOT VARIABLES
+        ============================================================ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --gold:          #C9A84C;
+            --gold-light:    #E8C97A;
+            --gold-dark:     #8B6914;
+            --gold-glow:     rgba(201, 168, 76, 0.15);
+            --gold-border:   rgba(201, 168, 76, 0.12);
+            --gold-border-b: rgba(201, 168, 76, 0.30);
+            --bg:            #0C0C0C;
+            --card:          #161410;
+            --card-alt:      #1C1A14;
+            --text:          #F5F0E8;
+            --text-muted:    #8A8070;
+            --text-dim:      #5A5040;
+            --green:         #4CAF82;
+            --red:           #C94C4C;
+            --nav-height:    70px;
+        }
+
+        /* ============================================================
+           BASE
+        ============================================================ */
+        html, body {
+            height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ============================================================
+           SPLASH SCREEN
+        ============================================================ */
+        #splash {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at center, #1a1500 0%, #000 70%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #splash-ring {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 1px solid rgba(201,168,76,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 40px rgba(201,168,76,0.1), inset 0 0 40px rgba(201,168,76,0.05);
+        }
+        #splash-ring.show { opacity: 1; transform: scale(1); }
+
+        #splash-logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid rgba(201,168,76,0.4);
+        }
+
+        #splash-title {
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            color: var(--gold-light);
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.8s ease 0.8s;
+            margin-top: 28px;
+        }
+        #splash-title.show { opacity: 1; transform: translateY(0); }
+
+        #splash-sub {
+            font-size: 11px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            opacity: 0;
+            transition: opacity 0.8s ease 1.1s;
+            margin-top: 8px;
+        }
+        #splash-sub.show { opacity: 1; }
+
+        #splash-line {
+            width: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin-top: 32px;
+            transition: width 1.5s ease 1s;
+        }
+        #splash-line.show { width: 160px; }
+
+        /* ============================================================
+           LOGIN SCREEN
+        ============================================================ */
+        #login-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 9000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+        #login-screen.hidden { display: none; }
+
+        .login-logo {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid rgba(201,168,76,0.4);
+            box-shadow: 0 0 30px rgba(201,168,76,0.2);
+            margin-bottom: 24px;
+        }
+
+        .login-title {
+            font-size: 26px;
+            font-weight: 300;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: var(--gold-light);
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            font-size: 11px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 40px;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 360px;
+            background: var(--card);
+            border: 1px solid var(--gold-border-b);
+            border-radius: 16px;
+            padding: 28px 22px;
+            position: relative;
+            overflow: hidden;
+        }
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .login-label {
+            font-size: 10px;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .login-input {
+            width: 100%;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--gold-border);
+            border-radius: 12px;
+            padding: 16px;
+            color: var(--gold-light);
+            font-size: 24px;
+            text-align: center;
+            outline: none;
+            letter-spacing: 12px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+        }
+        .login-input:focus { border-color: var(--gold-dark); }
+
+        .login-error {
+            color: var(--red);
+            font-size: 12px;
+            text-align: center;
+            margin-top: 12px;
+            display: none;
+            letter-spacing: 1px;
+        }
+        .login-error.show { display: block; }
+
+        /* ============================================================
+           HEADER
+        ============================================================ */
+        .header {
+            background: linear-gradient(180deg, rgba(20,18,12,0.98) 0%, rgba(12,12,12,0.95) 100%);
+            padding: 48px 20px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--gold-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+        }
+
+        .header-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--gold-dark);
+            box-shadow: 0 0 12px rgba(201,168,76,0.2);
+            flex-shrink: 0;
+        }
+
+        .header-info { flex: 1; min-width: 0; }
+        .header-title { font-size: 16px; font-weight: 600; letter-spacing: 1px; color: var(--gold-light); }
+        .header-sub { font-size: 9px; color: var(--text-dim); letter-spacing: 3px; text-transform: uppercase; }
+        .header-role { font-size: 9px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
+
+        .header-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .btn-header {
+            background: transparent;
+            border: 1px solid var(--gold-border-b);
+            color: var(--gold);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .btn-header:active { opacity: 0.7; }
+
+        /* ============================================================
+           BOTTOM NAVIGATION
+        ============================================================ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: linear-gradient(180deg, rgba(12,12,12,0) 0%, rgba(10,10,8,0.99) 30%);
+            border-top: 1px solid var(--gold-border);
+            display: flex;
+            padding: 10px 0 50px;
+            z-index: 100;
+            backdrop-filter: blur(30px);
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 4px 2px;
+            border: none;
+            background: none;
+            position: relative;
+        }
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            transition: width 0.3s ease;
+        }
+        .nav-item.active::after { width: 30px; }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.25;
+            color: var(--text);
+            transition: all 0.3s ease;
+            stroke: currentColor;
+        }
+        .nav-item.active .nav-icon { opacity: 1; color: var(--gold); }
+
+        .nav-label {
+            font-size: 9px;
+            color: var(--text-dim);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav-item.active .nav-label { color: var(--gold); }
+
+        /* ============================================================
+           PAGES
+        ============================================================ */
+        .page {
+            display: none;
+            padding: 16px;
+            padding-bottom: 140px;
+            min-height: 100vh;
+        }
+        .page.active { display: block; }
+
+        .page-title {
+            font-size: 22px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .page-divider {
+            width: 40px;
+            height: 1px;
+            background: linear-gradient(90deg, var(--gold), transparent);
+            margin-bottom: 16px;
+        }
+
+        /* ============================================================
+           CARDS
+        ============================================================ */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--gold-border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+        }
+
+        .card-premium {
+            background: linear-gradient(135deg, #161410 0%, #1C1A10 100%);
+            border: 1px solid var(--gold-border-b);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+        }
+        .card-premium::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .card-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--gold);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--gold-border-b), transparent);
+        }
+
+        /* ============================================================
+           FORM ELEMENTS
+        ============================================================ */
+        .form-group { margin-bottom: 12px; }
+
+        .form-label {
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+            display: block;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--gold-border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .form-input:focus { border-color: var(--gold-dark); }
+        select.form-input { appearance: none; }
+
+        /* ============================================================
+           BUTTONS
+        ============================================================ */
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 8px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-family: inherit;
+            transition: transform 0.1s, opacity 0.1s;
+        }
+        .btn:active { transform: scale(0.98); opacity: 0.9; }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #C9A84C 0%, #8B6914 50%, #C9A84C 100%);
+            color: #0C0C0C;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(201,168,76,0.25);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold-border-b);
+            font-weight: 500;
+        }
+
+        .btn-ghost {
+            background: rgba(201,168,76,0.05);
+            color: var(--text-muted);
+            border: 1px solid var(--gold-border);
+        }
+
+        .btn-danger {
+            background: rgba(201,76,76,0.08);
+            color: var(--red);
+            border: 1px solid rgba(201,76,76,0.2);
+        }
+
+        .icon-btn {
+            background: rgba(201,168,76,0.06);
+            border: 1px solid var(--gold-border);
+            color: var(--gold);
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: opacity 0.1s;
+        }
+        .icon-btn:active { opacity: 0.7; }
+        .icon-btn.danger { color: var(--red); border-color: rgba(201,76,76,0.2); }
+
+        .btn-row { display: flex; gap: 6px; }
+
+        .back-btn {
+            background: transparent;
+            border: 1px solid var(--gold-border);
+            color: var(--gold);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            font-family: inherit;
+        }
+
+        /* ============================================================
+           STAT GRID
+        ============================================================ */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .stat-cell {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--gold-border);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+        .stat-cell.span2 { grid-column: span 2; }
+        .stat-cell.accent {
+            border-color: var(--gold-border-b);
+            background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(0,0,0,0.3));
+        }
+
+        .stat-label {
+            font-size: 9px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .gold  { color: var(--gold-light) !important; }
+        .green { color: var(--green) !important; }
+        .red   { color: var(--red) !important; }
+
+        /* ============================================================
+           LIST ROWS
+        ============================================================ */
+        .list-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(201,168,76,0.05);
+        }
+        .list-row:last-child { border-bottom: none; }
+
+        .row-title { font-size: 14px; font-weight: 500; color: var(--text); }
+        .row-sub   { font-size: 11px; color: var(--text-dim); margin-top: 3px; }
+
+        /* ============================================================
+           BADGES
+        ============================================================ */
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .badge-gold  { background: rgba(201,168,76,0.08); color: var(--gold-light); border: 1px solid rgba(201,168,76,0.2); }
+        .badge-green { background: rgba(76,175,130,0.08); color: var(--green);      border: 1px solid rgba(76,175,130,0.2); }
+
+        /* ============================================================
+           DATE ROW
+        ============================================================ */
+        .date-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+
+        .arrow-btn {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--gold-border);
+            color: var(--gold);
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            font-size: 13px;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: inherit;
+        }
+
+        /* ============================================================
+           HERO STAT
+        ============================================================ */
+        .hero {
+            text-align: center;
+            padding: 20px 16px;
+        }
+        .hero-label {
+            font-size: 10px;
+            color: var(--text-dim);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .hero-value {
+            font-size: 32px;
+            font-weight: 300;
+            color: var(--gold-light);
+            letter-spacing: 1px;
+        }
+
+        .gold-rule {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-border-b), transparent);
+            margin: 12px 0;
+        }
+
+        /* ============================================================
+           TOAST NOTIFICATION
+        ============================================================ */
+        #toast {
+            position: fixed;
+            top: 95px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card-alt);
+            border: 1px solid var(--gold-border-b);
+            color: var(--gold-light);
+            padding: 10px 22px;
+            border-radius: 24px;
+            font-size: 12px;
+            font-weight: 500;
+            z-index: 9998;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            white-space: nowrap;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+        #toast.show { opacity: 1; }
+
+        /* ============================================================
+           STATUS BAR
+        ============================================================ */
+        .status-bar {
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .status-bar.show { display: block; }
+        .status-bar.success { background: rgba(76,175,130,0.08); color: var(--green); border: 1px solid rgba(76,175,130,0.15); }
+        .status-bar.warning { background: rgba(201,168,76,0.08); color: var(--gold);  border: 1px solid rgba(201,168,76,0.15); }
+
+        /* ============================================================
+           MODE TOGGLE
+        ============================================================ */
+        .mode-toggle {
+            display: flex;
+            background: var(--card);
+            border: 1px solid var(--gold-border);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 14px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 11px;
+            background: transparent;
+            color: var(--text-dim);
+            border: none;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .mode-btn.active {
+            background: linear-gradient(135deg, #C9A84C, #8B6914);
+            color: #0C0C0C;
+            box-shadow: 0 2px 12px rgba(201,168,76,0.3);
+        }
+
+        /* ============================================================
+           QUICK ENTRY
+        ============================================================ */
+        .quick-card {
+            background: var(--card);
+            border: 1px solid var(--gold-border);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .quick-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent);
+        }
+        .quick-card.has-data {
+            border-color: var(--gold-border-b);
+            background: linear-gradient(135deg, #161410, #1C1A10);
+        }
+
+        .quick-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gold-light);
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .quick-field { display: flex; flex-direction: column; gap: 3px; }
+
+        .quick-field-label {
+            font-size: 8px;
+            color: var(--text-dim);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .quick-input {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--gold-border);
+            border-radius: 8px;
+            padding: 8px 6px;
+            color: var(--text);
+            font-size: 14px;
+            text-align: center;
+            outline: none;
+            font-family: inherit;
+            -moz-appearance: textfield;
+            transition: border-color 0.2s;
+        }
+        .quick-input::-webkit-outer-spin-button,
+        .quick-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .quick-input:focus { border-color: var(--gold-dark); }
+        .quick-input.payment { color: var(--green); }
+
+        /* ============================================================
+           CUSTOMER HISTORY
+        ============================================================ */
+        .history-entry {
+            background: var(--card);
+            border: 1px solid var(--gold-border);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .history-date {
+            font-size: 11px;
+            color: var(--gold);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        /* ============================================================
+           BILL OVERLAY
+        ============================================================ */
+        #bill-overlay {
+            position: fixed;
+            inset: 0;
+            background: white;
+            z-index: 9999;
+            overflow-y: auto;
+            display: none;
+        }
+        #bill-overlay.show { display: block; }
+
+        .bill-topbar {
+            position: sticky;
+            top: 0;
+            background: #1a1a00;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--gold);
+            z-index: 10;
+        }
+
+        .bill-body { padding: 20px; max-width: 600px; margin: 0 auto; font-family: monospace; color: black; }
+
+        .bill-header-section {
+            text-align: center;
+            border-bottom: 2px solid black;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+        }
+
+        .bill-company { font-size: 20px; font-weight: bold; letter-spacing: 4px; }
+        .bill-company-sub { font-size: 12px; letter-spacing: 2px; margin-top: 4px; }
+
+        .bill-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .bill-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 11px;
+        }
+        .bill-table th {
+            padding: 7px 6px;
+            border: 1px solid #999;
+            background: #f5f5f5;
+            text-align: center;
+            font-weight: bold;
+        }
+        .bill-table th:first-child { text-align: left; }
+        .bill-table td {
+            padding: 6px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        .bill-table td:first-child { text-align: left; }
+        .bill-table td:last-child { text-align: right; font-weight: 600; }
+
+        .bill-summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 11px;
+        }
+        .bill-summary-table td { padding: 5px 8px; border: 1px solid #ccc; }
+        .bill-summary-table td:last-child { text-align: right; }
+        .bill-summary-table .section-head td { font-weight: bold; background: #f5f5f5; border-color: #999; font-size: 12px; }
+        .bill-summary-table .total-row td { font-weight: bold; background: #f0f0f0; border-color: #999; font-size: 12px; }
+        .bill-summary-table .outstanding-row td { font-weight: bold; background: #fff8e1; border-color: #999; font-size: 12px; }
+
+        .bill-footer { text-align: center; margin-top: 30px; font-size: 11px; color: #333; }
+
+        /* ============================================================
+           ROLE VISIBILITY
+        ============================================================ */
+        body.manager-mode .owner-only { display: none !important; }
+
+        /* ============================================================
+           EMPTY STATE
+        ============================================================ */
+        .empty-state {
+            text-align: center;
+            color: var(--text-dim);
+            padding: 32px;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+
+        .all-clear {
+            text-align: center;
+            padding: 32px;
+            color: var(--green);
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ================================================================
+     SPLASH SCREEN
+================================================================ -->
+<div id="splash">
+    <div id="splash-ring">
+        <img src="logo.png" id="splash-logo" alt="MA Bakers">
+    </div>
+    <div id="splash-title">MA Bakers</div>
+    <div id="splash-sub">Shawarma</div>
+    <div id="splash-line"></div>
+</div>
+
+<!-- ================================================================
+     LOGIN SCREEN
+================================================================ -->
+<div id="login-screen" class="hidden">
+    <img src="logo.png" class="login-logo" alt="MA Bakers">
+    <div class="login-title">MA Bakers</div>
+    <div class="login-subtitle">Shawarma</div>
+    <div class="login-card">
+        <div class="login-label">Enter Password</div>
+        <input type="password" id="login-input" class="login-input"
+               maxlength="4" inputmode="numeric" placeholder="••••"
+               autocomplete="off">
+        <button class="btn btn-primary" onclick="handleLogin()">Login</button>
+        <div class="login-error" id="login-error">Wrong password. Try again.</div>
+    </div>
+</div>
+
+<!-- ================================================================
+     HEADER
+================================================================ -->
+<div class="header">
+    <img src="logo.png" class="header-logo" alt="MA Bakers">
+    <div class="header-info">
+        <div class="header-title">MA Bakers</div>
+        <div class="header-sub">Shawarma</div>
+        <div class="header-role" id="header-role">—</div>
+    </div>
+    <div class="header-actions">
+        <button class="btn-header" onclick="syncData()">Sync</button>
+        <button class="btn-header" onclick="handleLogout()">Logout</button>
+    </div>
+</div>
+
+<!-- ================================================================
+     TOAST
+================================================================ -->
+<div id="toast"></div>
+
+<!-- ================================================================
+     PAGE: DAILY ENTRY
+================================================================ -->
+<div class="page active" id="page-daily">
+    <div class="page-title">Daily Entry</div>
+    <div class="page-divider"></div>
+
+    <!-- Mode Toggle -->
+    <div class="mode-toggle">
+        <button class="mode-btn active" id="mode-btn-quick"   onclick="switchEntryMode('quick')">⚡ Quick</button>
+        <button class="mode-btn"        id="mode-btn-detailed" onclick="switchEntryMode('detailed')">📋 Detailed</button>
+    </div>
+
+    <!-- ── QUICK MODE ── -->
+    <div id="entry-quick">
+        <div class="card-premium">
+            <div class="card-label">Select Date</div>
+            <div class="date-row">
+                <button class="arrow-btn" onclick="shiftDate('quick-date', -1); buildQuickList()">◀</button>
+                <input type="date" class="form-input" id="quick-date" onchange="buildQuickList()">
+                <button class="arrow-btn" onclick="shiftDate('quick-date', +1); buildQuickList()">▶</button>
+            </div>
+        </div>
+        <div id="quick-list"></div>
+        <div class="status-bar" id="quick-status"></div>
+        <button class="btn btn-primary" onclick="commitQuickEntries()">💾 Save All Entries</button>
+    </div>
+
+    <!-- ── DETAILED MODE ── -->
+    <div id="entry-detailed" style="display:none">
+        <div class="card-premium">
+            <div class="card-label">Date & Customer</div>
+            <div class="date-row">
+                <button class="arrow-btn" onclick="shiftDate('detail-date', -1)">◀</button>
+                <input type="date" class="form-input" id="detail-date" onchange="onDetailChange()">
+                <button class="arrow-btn" onclick="shiftDate('detail-date', +1)">▶</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Customer</label>
+                <select class="form-input" id="detail-customer" onchange="onDetailChange()">
+                    <option value="">Select customer…</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-label">Quantities</div>
+            <div class="stat-grid">
+                <div class="form-group"><label class="form-label">Shawarma Small</label><input type="number" class="form-input" id="d-small"  placeholder="0" oninput="recalcPreview()"></div>
+                <div class="form-group"><label class="form-label">Shawarma Large</label><input type="number" class="form-input" id="d-large"  placeholder="0" oninput="recalcPreview()"></div>
+                <div class="form-group"><label class="form-label">Burger</label>        <input type="number" class="form-input" id="d-burger" placeholder="0" oninput="recalcPreview()"></div>
+                <div class="form-group"><label class="form-label">Butter Paper</label>  <input type="number" class="form-input" id="d-butter" placeholder="0" oninput="recalcPreview()"></div>
+                <div class="form-group"><label class="form-label">Mayonnaise</label>    <input type="number" class="form-input" id="d-mayo"   placeholder="0" oninput="recalcPreview()"></div>
+                <div class="form-group"><label class="form-label">Rent</label>          <input type="number" class="form-input" id="d-rent"   placeholder="0" oninput="recalcPreview()"></div>
+                <div class="form-group owner-only span2-field" style="grid-column:span 2">
+                    <label class="form-label">Payment Received</label>
+                    <input type="number" class="form-input" id="d-payment" placeholder="0" oninput="recalcPreview()">
+                </div>
+            </div>
+        </div>
+
+        <div class="card-premium">
+            <div class="card-label">Live Calculation</div>
+            <div class="stat-grid">
+                <div class="stat-cell"><div class="stat-label">Shawarma Small</div><div class="stat-value" id="p-small">Rs 0</div></div>
+                <div class="stat-cell"><div class="stat-label">Shawarma Large</div><div class="stat-value" id="p-large">Rs 0</div></div>
+                <div class="stat-cell"><div class="stat-label">Burger</div>        <div class="stat-value" id="p-burger">Rs 0</div></div>
+                <div class="stat-cell"><div class="stat-label">Butter Paper</div> <div class="stat-value" id="p-butter">Rs 0</div></div>
+                <div class="stat-cell"><div class="stat-label">Mayonnaise</div>   <div class="stat-value" id="p-mayo">Rs 0</div></div>
+                <div class="stat-cell"><div class="stat-label">Rent</div>         <div class="stat-value" id="p-rent">Rs 0</div></div>
+                <div class="stat-cell accent span2"><div class="stat-label">Day Total</div><div class="stat-value gold" id="p-daytotal">Rs 0</div></div>
+                <div class="stat-cell owner-only"><div class="stat-label">Prev Balance</div><div class="stat-value" id="p-prevout">Rs 0</div></div>
+                <div class="stat-cell accent owner-only span2"><div class="stat-label">New Outstanding</div><div class="stat-value gold" id="p-newout">Rs 0</div></div>
+            </div>
+        </div>
+
+        <div class="status-bar" id="detail-status"></div>
+        <button class="btn btn-primary" onclick="commitDetailedEntry()">Save Entry</button>
+    </div>
+</div>
+
+<!-- ================================================================
+     PAGE: CUSTOMERS
+================================================================ -->
+<div class="page" id="page-customers">
+    <div class="page-title">Customers</div>
+    <div class="page-divider"></div>
+
+    <div class="card-premium owner-only" id="customer-form-card">
+        <div class="card-label" id="customer-form-title">Add Customer</div>
+        <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-input" id="cf-name" placeholder="Customer name">
+        </div>
+        <div class="stat-grid">
+            <div class="form-group"><label class="form-label">Shawarma Small Rate</label><input type="number" class="form-input" id="cf-small"  placeholder="Rate"></div>
+            <div class="form-group"><label class="form-label">Shawarma Large Rate</label><input type="number" class="form-input" id="cf-large"  placeholder="0"></div>
+            <div class="form-group"><label class="form-label">Burger Rate</label>        <input type="number" class="form-input" id="cf-burger" placeholder="0"></div>
+            <div class="form-group"><label class="form-label">Butter Paper Rate</label>  <input type="number" class="form-input" id="cf-butter" placeholder="0"></div>
+            <div class="form-group"><label class="form-label">Mayonnaise Rate</label>    <input type="number" class="form-input" id="cf-mayo"   placeholder="0"></div>
+            <div class="form-group"><label class="form-label">Opening Balance</label>    <input type="number" class="form-input" id="cf-opening" placeholder="0"></div>
+        </div>
+        <button class="btn btn-primary" id="cf-save-btn" onclick="saveCustomer()">Save Customer</button>
+        <button class="btn btn-ghost" onclick="resetCustomerForm()">Cancel</button>
+    </div>
+
+    <div class="card">
+        <div class="card-label">Customer List</div>
+        <div id="customer-list"><div class="empty-state">No customers added yet</div></div>
+    </div>
+</div>
+
+<!-- ================================================================
+     PAGE: CUSTOMER HISTORY
+================================================================ -->
+<div class="page" id="page-cust-history">
+    <button class="back-btn" onclick="navigateTo('customers')">← Back to Customers</button>
+    <div class="page-title" id="ch-title">History</div>
+    <div class="page-divider"></div>
+
+    <div class="card-premium">
+        <div class="card-label">📅 Date Range</div>
+        <div class="form-group">
+            <label class="form-label">From</label>
+            <input type="date" class="form-input" id="ch-from">
+        </div>
+        <div class="form-group">
+            <label class="form-label">To</label>
+            <input type="date" class="form-input" id="ch-to">
+        </div>
+        <button class="btn btn-primary" onclick="renderCustomerHistory()">View History</button>
+    </div>
+
+    <div id="ch-content"></div>
+</div>
+
+<!-- ================================================================
+     PAGE: OUTSTANDING
+================================================================ -->
+<div class="page owner-only" id="page-outstanding">
+    <div class="page-title">Outstanding</div>
+    <div class="page-divider"></div>
+    <button class="btn btn-outline" onclick="renderOutstanding()" style="margin-bottom:14px">↺ Refresh</button>
+    <div class="card">
+        <div id="outstanding-list"><div class="empty-state">Loading…</div></div>
+    </div>
+</div>
+
+<!-- ================================================================
+     PAGE: DAILY SUMMARY
+================================================================ -->
+<div class="page" id="page-summary">
+    <div class="page-title">Daily Summary</div>
+    <div class="page-divider"></div>
+    <div class="card-premium">
+        <div class="card-label">Select Date</div>
+        <div class="date-row">
+            <button class="arrow-btn" onclick="shiftDate('sum-date', -1)">◀</button>
+            <input type="date" class="form-input" id="sum-date">
+            <button class="arrow-btn" onclick="shiftDate('sum-date', +1)">▶</button>
+        </div>
+        <button class="btn btn-primary" onclick="renderDailySummary()">View Summary</button>
+    </div>
+    <div id="summary-content"></div>
+</div>
+
+<!-- ================================================================
+     PAGE: MONTHLY REPORT
+================================================================ -->
+<div class="page" id="page-monthly">
+    <div class="page-title">Monthly Report</div>
+    <div class="page-divider"></div>
+    <div class="card-premium">
+        <div class="card-label">Select Period</div>
+        <div class="stat-grid">
+            <div class="form-group">
+                <label class="form-label">Year</label>
+                <input type="number" class="form-input" id="mon-year" placeholder="2026">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Month</label>
+                <select class="form-input" id="mon-month">
+                    <option value="01">January</option><option value="02">February</option>
+                    <option value="03">March</option>  <option value="04">April</option>
+                    <option value="05">May</option>    <option value="06">June</option>
+                    <option value="07">July</option>   <option value="08">August</option>
+                    <option value="09">September</option><option value="10">October</option>
+                    <option value="11">November</option><option value="12">December</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="renderMonthlyReport()">Generate Report</button>
+    </div>
+    <div id="monthly-content"></div>
+</div>
+
+<!-- ================================================================
+     PAGE: HISTORY
+================================================================ -->
+<div class="page" id="page-history">
+    <div class="page-title">History</div>
+    <div class="page-divider"></div>
+    <div class="card-premium">
+        <div class="card-label">Select Date</div>
+        <div class="date-row">
+            <button class="arrow-btn" onclick="shiftDate('hist-date', -1)">◀</button>
+            <input type="date" class="form-input" id="hist-date">
+            <button class="arrow-btn" onclick="shiftDate('hist-date', +1)">▶</button>
+        </div>
+        <button class="btn btn-primary" onclick="renderHistory()">View History</button>
+    </div>
+    <div id="history-content"></div>
+</div>
+
+<!-- ================================================================
+     BOTTOM NAVIGATION
+================================================================ -->
+<div class="bottom-nav">
+    <button class="nav-item active" id="nav-daily"       onclick="navigateTo('daily')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        <span class="nav-label">Daily</span>
+    </button>
+    <button class="nav-item" id="nav-customers"          onclick="navigateTo('customers')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/></svg>
+        <span class="nav-label">Customers</span>
+    </button>
+    <button class="nav-item owner-only" id="nav-outstanding" onclick="navigateTo('outstanding')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span class="nav-label">Balance</span>
+    </button>
+    <button class="nav-item" id="nav-summary"            onclick="navigateTo('summary')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span class="nav-label">Summary</span>
+    </button>
+    <button class="nav-item" id="nav-monthly"            onclick="navigateTo('monthly')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="nav-label">Monthly</span>
+    </button>
+    <button class="nav-item" id="nav-history"            onclick="navigateTo('history')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+        <span class="nav-label">History</span>
+    </button>
+</div>
+
+<!-- ================================================================
+     BILL OVERLAY
+================================================================ -->
+<div id="bill-overlay">
+    <div class="bill-topbar">
+        <button onclick="closeBill()" style="background:transparent;border:1px solid var(--gold);color:var(--gold);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">✕ Close</button>
+        <span style="color:var(--gold-light);font-size:13px;font-weight:600;letter-spacing:1px;">BILL PREVIEW</span>
+        <button id="share-btn" style="background:linear-gradient(135deg,#C9A84C,#8B6914);border:none;color:#000;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📤 Share</button>
+    </div>
+    <div id="bill-body" class="bill-body"></div>
+</div>
+
+<!-- ================================================================
+     JAVASCRIPT
+================================================================ -->
+<script>
+'use strict';
+
+/* ================================================================
+   CONSTANTS & STATE
+================================================================ */
+const PASSWORDS   = { '0000': 'manager', '9900': 'owner' };
+const SYNC_URL    = 'https://mabakers.bonto.run/api/sync';
+const SYNC_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+
+let state = {
+    data:     { customers: {}, daily: {} },
+    role:     null,   // 'owner' | 'manager' | null
+    syncTimer: null,
+    editingCustomer: null,   // name string when editing
+    historyCustomer: null,   // name string for history page
+};
+
+/* ================================================================
+   STORAGE — read / write
+================================================================ */
+function persistData() {
+    const json = JSON.stringify(state.data);
+    try {
+        if (window.AndroidBridge) {
+            window.AndroidBridge.saveData(json);
+        } else {
+            localStorage.setItem('mabakers_v2', json);
+        }
+    } catch (_) {
+        localStorage.setItem('mabakers_v2', json);
+    }
+}
+
+function loadData() {
+    try {
+        let raw = null;
+        if (window.AndroidBridge) {
+            raw = window.AndroidBridge.loadData();
+        }
+        if (!raw) {
+            raw = localStorage.getItem('mabakers_v2')
+               || localStorage.getItem('mabakers'); // legacy key
+        }
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (isValidAppData(parsed)) {
+                state.data = parsed;
+            }
+        }
+    } catch (_) { /* keep default empty state */ }
+}
+
+function isValidAppData(obj) {
+    return obj
+        && typeof obj === 'object'
+        && obj.customers && typeof obj.customers === 'object'
+        && obj.daily     && typeof obj.daily     === 'object';
+}
+
+/* ================================================================
+   UTILITY HELPERS
+================================================================ */
+function todayISO() {
+    return new Date().toISOString().split('T')[0];
+}
+
+function firstOfMonthISO() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
+}
+
+function fmtMoney(n) {
+    return 'Rs ' + Math.round(n).toLocaleString('en-PK');
+}
+
+function n(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function v(id) { return (document.getElementById(id).value || '').trim(); }
+function set(id, val) { document.getElementById(id).value = val; }
+
+/* ================================================================
+   TOAST
+================================================================ */
+let _toastTimer = null;
+function showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+/* ================================================================
+   STATUS BAR
+================================================================ */
+let _statusTimers = {};
+function showStatus(id, msg, type) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = msg;
+    el.className = `status-bar show ${type}`;
+    clearTimeout(_statusTimers[id]);
+    _statusTimers[id] = setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+/* ================================================================
+   NAVIGATION
+================================================================ */
+function navigateTo(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+
+    const pageEl = document.getElementById(`page-${page}`);
+    const navEl  = document.getElementById(`nav-${page}`);
+
+    if (pageEl) pageEl.classList.add('active');
+    if (navEl)  navEl.classList.add('active');
+
+    // Side effects per page
+    if (page === 'daily')       buildQuickList();
+    if (page === 'outstanding') renderOutstanding();
+}
+
+/* ================================================================
+   DATE HELPERS
+================================================================ */
+function shiftDate(inputId, delta) {
+    const el = document.getElementById(inputId);
+    const d  = new Date(el.value);
+    d.setDate(d.getDate() + delta);
+    el.value = d.toISOString().split('T')[0];
+}
+
+/* ================================================================
+   AUTHENTICATION
+================================================================ */
+function handleLogin() {
+    const pwd = document.getElementById('login-input').value;
+    const role = PASSWORDS[pwd];
+
+    if (role) {
+        state.role = role;
+        localStorage.setItem('ma_role', role);
+        applyRole();
+        document.getElementById('login-screen').classList.add('hidden');
+        startAutoSync();
+        buildQuickList();
+    } else {
+        const errEl = document.getElementById('login-error');
+        errEl.classList.add('show');
+        document.getElementById('login-input').value = '';
+        setTimeout(() => errEl.classList.remove('show'), 2500);
+    }
+}
+
+function handleLogout() {
+    state.role = null;
+    localStorage.removeItem('ma_role');
+    stopAutoSync();
+    document.getElementById('login-input').value = '';
+    document.getElementById('login-screen').classList.remove('hidden');
+    showToast('Logged out successfully');
+}
+
+function applyRole() {
+    const isManager = state.role === 'manager';
+    document.body.classList.toggle('manager-mode', isManager);
+    document.getElementById('header-role').textContent = isManager ? 'Manager' : 'Owner';
+}
+
+/* ================================================================
+   SYNC
+================================================================ */
+function startAutoSync() {
+    stopAutoSync();
+    state.syncTimer = setInterval(syncSilent, SYNC_INTERVAL_MS);
+}
+
+function stopAutoSync() {
+    if (state.syncTimer) {
+        clearInterval(state.syncTimer);
+        state.syncTimer = null;
+    }
+}
+
+async function syncSilent() {
+    try {
+        const res = await fetch(SYNC_URL, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(state.data),
+        });
+        if (res.ok) {
+            const merged = await res.json();
+            if (isValidAppData(merged)) {
+                state.data = merged;
+                persistData();
+                refreshAllViews();
+            }
+        }
+    } catch (_) { /* silent — no internet */ }
+}
+
+async function syncData() {
+    showToast('Syncing…');
+    try {
+        const res = await fetch(SYNC_URL, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(state.data),
+        });
+        if (!res.ok) { showToast('Sync failed — server error'); return; }
+        const merged = await res.json();
+        if (isValidAppData(merged)) {
+            state.data = merged;
+            persistData();
+            refreshAllViews();
+            showToast('✓ Synced successfully');
+        } else {
+            showToast('Sync error — data protected');
+        }
+    } catch (_) {
+        showToast('No internet connection');
+    }
+}
+
+function refreshAllViews() {
+    renderCustomerList();
+    renderOutstanding();
+    buildQuickList();
+}
+
+/* ================================================================
+   OUTSTANDING CALCULATION
+================================================================ */
+
+/**
+ * Returns the outstanding balance for a customer just before a given date.
+ * Looks at all entries with date < targetDate, picks the most recent one.
+ */
+function getPrevOutstanding(customerName, targetDate) {
+    const daily = state.data.daily;
+    const priorDates = Object.keys(daily)
+        .filter(d => daily[d][customerName] !== undefined && d < targetDate)
+        .sort();
+
+    if (priorDates.length > 0) {
+        return daily[priorDates[priorDates.length - 1]][customerName].outstanding || 0;
+    }
+
+    // No prior entries — use opening balance
+    const customer = state.data.customers[customerName];
+    return customer ? (customer.opening_outstanding || 0) : 0;
+}
+
+/**
+ * After editing/saving an entry for a customer on a given date,
+ * cascade-recalculate all future entries for that customer
+ * so outstanding stays consistent.
+ */
+function cascadeRecalc(customerName, fromDate) {
+    const daily = state.data.daily;
+    const futureDates = Object.keys(daily)
+        .filter(d => daily[d][customerName] !== undefined && d > fromDate)
+        .sort(); // ascending — must process in order
+
+    for (const date of futureDates) {
+        const entry = daily[date][customerName];
+        const prevOut = getPrevOutstanding(customerName, date);
+        entry.prev_outstanding = prevOut;
+        entry.outstanding      = prevOut + entry.day_total - entry.payment;
+    }
+}
+
+/* ================================================================
+   QUICK ENTRY
+================================================================ */
+function buildQuickList() {
+    const date       = document.getElementById('quick-date').value;
+    const container  = document.getElementById('quick-list');
+    const customers  = state.data.customers;
+    const names      = Object.keys(customers);
+
+    if (!names.length) {
+        container.innerHTML = '<div class="empty-state">Add customers first</div>';
+        return;
+    }
+
+    const existing = state.data.daily[date] || {};
+
+    container.innerHTML = names.map(name => {
+        const c = customers[name];
+        const e = existing[name] || {};
+
+        const hasSmall  = (c.shawarma_small_rate || 0) > 0;
+        const hasLarge  = (c.shawarma_large_rate  || 0) > 0;
+        const hasBurger = (c.burger_rate           || 0) > 0;
+        const hasButter = (c.butter_rate           || 0) > 0;
+        const hasMayo   = (c.mayo_rate             || 0) > 0;
+
+        const field = (label, fieldKey, val, extra = '') =>
+            `<div class="quick-field">
+                <div class="quick-field-label">${label}</div>
+                <input type="number" class="quick-input ${extra}"
+                       data-customer="${name}" data-field="${fieldKey}"
+                       value="${val || ''}" placeholder="0">
+             </div>`;
+
+        let fields = '';
+        if (hasSmall)  fields += field('Small',   'small',   e.shawarma_small_qty  || 0 || '');
+        if (hasLarge)  fields += field('Large',   'large',   e.shawarma_large_qty  || 0 || '');
+        if (hasBurger) fields += field('Burger',  'burger',  e.burger_qty          || 0 || '');
+        if (hasButter) fields += field('Butter',  'butter',  e.butter_qty          || 0 || '');
+        if (hasMayo)   fields += field('Mayo',    'mayo',    e.mayo_qty            || 0 || '');
+                       fields += field('Rent',    'rent',    e.rent                || 0 || '');
+
+        if (state.role === 'owner') {
+            fields += field('💵 Payment', 'payment', e.payment || 0 || '', 'payment');
+        }
+
+        const hasData = Object.keys(e).length > 0;
+
+        return `<div class="quick-card ${hasData ? 'has-data' : ''}">
+                    <div class="quick-name">${name}</div>
+                    <div class="quick-grid">${fields}</div>
+                </div>`;
+    }).join('');
+}
+
+function commitQuickEntries() {
+    const date    = document.getElementById('quick-date').value;
+    const inputs  = document.querySelectorAll('.quick-input');
+    const daily   = state.data.daily;
+
+    // Group input values by customer
+    const byCustomer = {};
+    inputs.forEach(input => {
+        const name  = input.dataset.customer;
+        const field = input.dataset.field;
+        const val   = parseFloat(input.value) || 0;
+        if (!byCustomer[name]) byCustomer[name] = {};
+        byCustomer[name][field] = val;
+    });
+
+    // Ensure date bucket exists
+    if (!daily[date]) daily[date] = {};
+
+    let savedCount = 0;
+
+    for (const name of Object.keys(byCustomer)) {
+        const d = byCustomer[name];
+        const c = state.data.customers[name];
+        if (!c) continue;
+
+        const totalQty = (d.small || 0) + (d.large || 0) + (d.burger || 0)
+                       + (d.butter || 0) + (d.mayo || 0);
+        const hasData  = totalQty > 0 || (d.payment || 0) > 0 || (d.rent || 0) > 0;
+
+        if (!hasData) {
+            // Remove entry if it existed
+            if (daily[date][name]) delete daily[date][name];
+            continue;
+        }
+
+        // Rates
+        const rates = {
+            small:  c.shawarma_small_rate || 0,
+            large:  c.shawarma_large_rate || 0,
+            burger: c.burger_rate         || 0,
+            butter: c.butter_rate         || 0,
+            mayo:   c.mayo_rate           || 0,
+        };
+
+        // Totals
+        const smallTotal  = (d.small  || 0) * rates.small;
+        const largeTotal  = (d.large  || 0) * rates.large;
+        const burgerTotal = (d.burger || 0) * rates.burger;
+        const butterTotal = (d.butter || 0) * rates.butter;
+        const mayoTotal   = (d.mayo   || 0) * rates.mayo;
+        const dayTotal    = smallTotal + largeTotal + burgerTotal + butterTotal + mayoTotal + (d.rent || 0);
+
+        // Payment: managers cannot change payment
+        let payment = d.payment || 0;
+        if (state.role === 'manager') {
+            payment = daily[date][name] ? (daily[date][name].payment || 0) : 0;
+        }
+
+        const prevOut = getPrevOutstanding(name, date);
+
+        daily[date][name] = {
+            shawarma_small_qty:   d.small  || 0,
+            shawarma_small_rate:  rates.small,
+            shawarma_small_total: smallTotal,
+            shawarma_large_qty:   d.large  || 0,
+            shawarma_large_rate:  rates.large,
+            shawarma_large_total: largeTotal,
+            burger_qty:           d.burger || 0,
+            burger_rate:          rates.burger,
+            burger_total:         burgerTotal,
+            butter_qty:           d.butter || 0,
+            butter_rate:          rates.butter,
+            butter_total:         butterTotal,
+            mayo_qty:             d.mayo   || 0,
+            mayo_rate:            rates.mayo,
+            mayo_total:           mayoTotal,
+            rent:                 d.rent   || 0,
+            day_total:            dayTotal,
+            payment:              payment,
+            prev_outstanding:     prevOut,
+            outstanding:          prevOut + dayTotal - payment,
+        };
+
+        // Cascade recalculate future dates for this customer
+        cascadeRecalc(name, date);
+        savedCount++;
+    }
+
+    // Clean up empty date bucket
+    if (daily[date] && Object.keys(daily[date]).length === 0) {
+        delete daily[date];
+    }
+
+    persistData();
+
+    if (savedCount > 0) {
+        showStatus('quick-status', `✓ ${savedCount} ${savedCount === 1 ? 'entry' : 'entries'} saved`, 'success');
+        buildQuickList(); // refresh to show has-data styling
+    } else {
+        showStatus('quick-status', 'No data to save', 'warning');
+    }
+}
+
+/* ================================================================
+   DETAILED ENTRY MODE
+================================================================ */
+function switchEntryMode(mode) {
+    const isQuick    = mode === 'quick';
+    document.getElementById('mode-btn-quick').classList.toggle('active',    isQuick);
+    document.getElementById('mode-btn-detailed').classList.toggle('active', !isQuick);
+    document.getElementById('entry-quick').style.display    = isQuick    ? 'block' : 'none';
+    document.getElementById('entry-detailed').style.display = isQuick    ? 'none'  : 'block';
+    if (isQuick) buildQuickList();
+}
+
+function onDetailChange() {
+    const name = v('detail-customer');
+    const date = v('detail-date');
+
+    // Auto-fill existing entry if one exists
+    if (name && date) {
+        const existing = state.data.daily[date]?.[name];
+        if (existing) {
+            set('d-small',   existing.shawarma_small_qty || '');
+            set('d-large',   existing.shawarma_large_qty || '');
+            set('d-burger',  existing.burger_qty         || '');
+            set('d-butter',  existing.butter_qty         || '');
+            set('d-mayo',    existing.mayo_qty           || '');
+            set('d-rent',    existing.rent               || '');
+            if (state.role === 'owner') {
+                set('d-payment', existing.payment || '');
+            }
+        } else {
+            // Clear fields for new entry
+            ['d-small','d-large','d-burger','d-butter','d-mayo','d-rent','d-payment']
+                .forEach(id => set(id, ''));
+        }
+    }
+
+    recalcPreview();
+}
+
+function recalcPreview() {
+    const name = v('detail-customer');
+    const date = v('detail-date');
+
+    if (!name || !state.data.customers[name]) {
+        ['p-small','p-large','p-burger','p-butter','p-mayo','p-rent','p-daytotal','p-prevout','p-newout']
+            .forEach(id => { const el = document.getElementById(id); if (el) el.textContent = 'Rs 0'; });
+        return;
+    }
+
+    const c = state.data.customers[name];
+
+    const smallT  = n('d-small')  * (c.shawarma_small_rate || 0);
+    const largeT  = n('d-large')  * (c.shawarma_large_rate || 0);
+    const burgerT = n('d-burger') * (c.burger_rate          || 0);
+    const butterT = n('d-butter') * (c.butter_rate          || 0);
+    const mayoT   = n('d-mayo')   * (c.mayo_rate            || 0);
+    const rentT   = n('d-rent');
+    const dayTotal = smallT + largeT + burgerT + butterT + mayoT + rentT;
+    const prevOut  = getPrevOutstanding(name, date);
+    const payment  = state.role === 'owner' ? n('d-payment') : 0;
+    const newOut   = prevOut + dayTotal - payment;
+
+    document.getElementById('p-small').textContent   = fmtMoney(smallT);
+    document.getElementById('p-large').textContent   = fmtMoney(largeT);
+    document.getElementById('p-burger').textContent  = fmtMoney(burgerT);
+    document.getElementById('p-butter').textContent  = fmtMoney(butterT);
+    document.getElementById('p-mayo').textContent    = fmtMoney(mayoT);
+    document.getElementById('p-rent').textContent    = fmtMoney(rentT);
+    document.getElementById('p-daytotal').textContent = fmtMoney(dayTotal);
+
+    const prevEl = document.getElementById('p-prevout');
+    const newEl  = document.getElementById('p-newout');
+    if (prevEl) prevEl.textContent = fmtMoney(prevOut);
+    if (newEl) {
+        newEl.textContent = fmtMoney(newOut);
+        newEl.className   = 'stat-value ' + (newOut <= 0 ? 'green' : 'gold');
+    }
+}
+
+function commitDetailedEntry() {
+    const name = v('detail-customer');
+    const date = v('detail-date');
+
+    if (!name || !state.data.customers[name]) {
+        showToast('Please select a customer');
+        return;
+    }
+
+    const c = state.data.customers[name];
+
+    const smallQty  = n('d-small');
+    const largeQty  = n('d-large');
+    const burgerQty = n('d-burger');
+    const butterQty = n('d-butter');
+    const mayoQty   = n('d-mayo');
+    const rent      = n('d-rent');
+
+    const smallT  = smallQty  * (c.shawarma_small_rate || 0);
+    const largeT  = largeQty  * (c.shawarma_large_rate || 0);
+    const burgerT = burgerQty * (c.burger_rate          || 0);
+    const butterT = butterQty * (c.butter_rate          || 0);
+    const mayoT   = mayoQty   * (c.mayo_rate            || 0);
+    const dayTotal = smallT + largeT + burgerT + butterT + mayoT + rent;
+
+    // Payment handling
+    let payment = 0;
+    if (state.role === 'owner') {
+        payment = n('d-payment');
+    } else {
+        // Manager: preserve existing payment
+        payment = state.data.daily[date]?.[name]?.payment || 0;
+    }
+
+    const prevOut = getPrevOutstanding(name, date);
+
+    if (!state.data.daily[date]) state.data.daily[date] = {};
+
+    state.data.daily[date][name] = {
+        shawarma_small_qty:   smallQty,
+        shawarma_small_rate:  c.shawarma_small_rate || 0,
+        shawarma_small_total: smallT,
+        shawarma_large_qty:   largeQty,
+        shawarma_large_rate:  c.shawarma_large_rate || 0,
+        shawarma_large_total: largeT,
+        burger_qty:           burgerQty,
+        burger_rate:          c.burger_rate  || 0,
+        burger_total:         burgerT,
+        butter_qty:           butterQty,
+        butter_rate:          c.butter_rate  || 0,
+        butter_total:         butterT,
+        mayo_qty:             mayoQty,
+        mayo_rate:            c.mayo_rate    || 0,
+        mayo_total:           mayoT,
+        rent,
+        day_total:        dayTotal,
+        payment,
+        prev_outstanding: prevOut,
+        outstanding:      prevOut + dayTotal - payment,
+    };
+
+    cascadeRecalc(name, date);
+    persistData();
+
+    if (state.role === 'owner') {
+        const newOut = prevOut + dayTotal - payment;
+        showStatus('detail-status',
+            `Saved · Outstanding ${fmtMoney(newOut)}`,
+            newOut <= 0 ? 'success' : 'warning');
+    } else {
+        showStatus('detail-status', 'Entry saved successfully', 'success');
+    }
+
+    // Clear fields
+    ['d-small','d-large','d-burger','d-butter','d-mayo','d-rent','d-payment']
+        .forEach(id => set(id, ''));
+    recalcPreview();
+}
+
+/* ================================================================
+   CUSTOMER MANAGEMENT
+================================================================ */
+function renderCustomerList() {
+    const names   = Object.keys(state.data.customers);
+    const listEl  = document.getElementById('customer-list');
+    const selEl   = document.getElementById('detail-customer');
+
+    if (!names.length) {
+        listEl.innerHTML = '<div class="empty-state">No customers added yet</div>';
+    } else {
+        listEl.innerHTML = names.map(name => {
+            const c   = state.data.customers[name];
+            const sr  = c.shawarma_small_rate || 0;
+            const slr = c.shawarma_large_rate || 0;
+
+            const ownerBtns = state.role === 'owner'
+                ? `<button class="icon-btn"        onclick="editCustomer('${name}')">✏️</button>
+                   <button class="icon-btn danger" onclick="deleteCustomer('${name}')">🗑️</button>`
+                : '';
+
+            return `<div class="list-row">
+                        <div>
+                            <div class="row-title">${name}</div>
+                            <div class="row-sub">Small Rs ${sr} · Large ${slr ? 'Rs ' + slr : '—'} · Burger ${c.burger_rate ? 'Rs ' + c.burger_rate : '—'}</div>
+                            <div class="row-sub">Butter ${c.butter_rate ? 'Rs ' + c.butter_rate : '—'} · Mayo ${c.mayo_rate ? 'Rs ' + c.mayo_rate : '—'}</div>
+                        </div>
+                        <div class="btn-row">
+                            <button class="icon-btn" onclick="openCustomerHistory('${name}')">👁</button>
+                            ${ownerBtns}
+                        </div>
+                    </div>`;
+        }).join('');
+    }
+
+    // Sync dropdown
+    const prev = selEl.value;
+    selEl.innerHTML = '<option value="">Select customer…</option>'
+        + names.map(n => `<option value="${n}" ${n === prev ? 'selected' : ''}>${n}</option>`).join('');
+}
+
+function saveCustomer() {
+    const newName  = v('cf-name');
+    const smallRate = parseFloat(document.getElementById('cf-small').value)  || 0;
+    const largeRate = parseFloat(document.getElementById('cf-large').value)  || 0;
+    const burgerRate= parseFloat(document.getElementById('cf-burger').value) || 0;
+    const butterRate= parseFloat(document.getElementById('cf-butter').value) || 0;
+    const mayoRate  = parseFloat(document.getElementById('cf-mayo').value)   || 0;
+    const opening   = parseFloat(document.getElementById('cf-opening').value)|| 0;
+
+    if (!newName)      { showToast('Please enter customer name');         return; }
+    if (!smallRate)    { showToast('Please enter Shawarma Small rate');   return; }
+
+    const oldName = state.editingCustomer;
+
+    // If renaming, migrate all historical daily entries to new name
+    if (oldName && oldName !== newName) {
+        delete state.data.customers[oldName];
+        for (const date of Object.keys(state.data.daily)) {
+            if (state.data.daily[date][oldName] !== undefined) {
+                state.data.daily[date][newName] = state.data.daily[date][oldName];
+                delete state.data.daily[date][oldName];
+            }
+        }
+    }
+
+    state.data.customers[newName] = {
+        shawarma_small_rate: smallRate,
+        shawarma_large_rate: largeRate,
+        burger_rate:         burgerRate,
+        butter_rate:         butterRate,
+        mayo_rate:           mayoRate,
+        opening_outstanding: opening,
+    };
+
+    persistData();
+    resetCustomerForm();
+    renderCustomerList();
+    buildQuickList();
+    showToast(oldName ? 'Customer updated' : 'Customer added');
+}
+
+function editCustomer(name) {
+    const c = state.data.customers[name];
+    state.editingCustomer = name;
+
+    set('cf-name',    name);
+    set('cf-small',   c.shawarma_small_rate || '');
+    set('cf-large',   c.shawarma_large_rate || '');
+    set('cf-burger',  c.burger_rate         || '');
+    set('cf-butter',  c.butter_rate         || '');
+    set('cf-mayo',    c.mayo_rate           || '');
+    set('cf-opening', c.opening_outstanding || '');
+
+    document.getElementById('customer-form-title').textContent = 'Edit Customer';
+    document.getElementById('cf-save-btn').textContent         = 'Update Customer';
+
+    navigateTo('customers');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function deleteCustomer(name) {
+    if (!confirm(`Delete "${name}"?\n\nThis will remove the customer. All history entries will be kept.`)) return;
+    delete state.data.customers[name];
+    persistData();
+    renderCustomerList();
+    buildQuickList();
+    showToast(`${name} deleted`);
+}
+
+function resetCustomerForm() {
+    state.editingCustomer = null;
+    ['cf-name','cf-small','cf-large','cf-burger','cf-butter','cf-mayo','cf-opening']
+        .forEach(id => set(id, ''));
+    document.getElementById('customer-form-title').textContent = 'Add Customer';
+    document.getElementById('cf-save-btn').textContent         = 'Save Customer';
+}
+
+/* ================================================================
+   CUSTOMER HISTORY
+================================================================ */
+function openCustomerHistory(name) {
+    state.historyCustomer = name;
+    document.getElementById('ch-title').textContent = name;
+    set('ch-from', firstOfMonthISO());
+    set('ch-to',   todayISO());
+    document.getElementById('ch-content').innerHTML = '';
+    navigateTo('cust-history');
+    renderCustomerHistory();
+}
+
+function renderCustomerHistory() {
+    const name = state.historyCustomer;
+    if (!name) return;
+
+    const from    = v('ch-from');
+    const to      = v('ch-to');
+    const daily   = state.data.daily;
+    const content = document.getElementById('ch-content');
+
+    // Get dates in range, ascending
+    const dates = Object.keys(daily)
+        .filter(d => daily[d][name] !== undefined && d >= from && d <= to)
+        .sort();
+
+    if (!dates.length) {
+        content.innerHTML = '<div class="empty-state">No entries found for this period</div>';
+        return;
+    }
+
+    // Accumulate totals
+    let totals = { smallQty:0, largeQty:0, burgerQty:0, butterQty:0, mayoQty:0,
+                   smallAmt:0, largeAmt:0, burgerAmt:0, butterAmt:0, mayoAmt:0,
+                   rent:0, paid:0, dayTotal:0 };
+
+    // Build entry cards (newest first)
+    const entryCards = [...dates].reverse().map(d => {
+        const e = daily[d][name];
+
+        totals.smallQty  += e.shawarma_small_qty   || 0;
+        totals.largeQty  += e.shawarma_large_qty   || 0;
+        totals.burgerQty += e.burger_qty            || 0;
+        totals.butterQty += e.butter_qty            || 0;
+        totals.mayoQty   += e.mayo_qty              || 0;
+        totals.smallAmt  += e.shawarma_small_total  || 0;
+        totals.largeAmt  += e.shawarma_large_total  || 0;
+        totals.burgerAmt += e.burger_total          || 0;
+        totals.butterAmt += e.butter_total          || 0;
+        totals.mayoAmt   += e.mayo_total            || 0;
+        totals.rent      += e.rent                  || 0;
+        totals.paid      += e.payment               || 0;
+        totals.dayTotal  += e.day_total             || 0;
+
+        let details = '';
+        if (e.shawarma_small_qty)  details += `<div class="row-sub">🫓 Small: ${e.shawarma_small_qty} = ${fmtMoney(e.shawarma_small_total || 0)}</div>`;
+        if (e.shawarma_large_qty)  details += `<div class="row-sub">🫓 Large: ${e.shawarma_large_qty} = ${fmtMoney(e.shawarma_large_total || 0)}</div>`;
+        if (e.burger_qty)          details += `<div class="row-sub">🍔 Burger: ${e.burger_qty} = ${fmtMoney(e.burger_total || 0)}</div>`;
+        if (e.butter_qty)          details += `<div class="row-sub">🧻 Butter: ${e.butter_qty} = ${fmtMoney(e.butter_total || 0)}</div>`;
+        if (e.mayo_qty)            details += `<div class="row-sub">🥫 Mayo: ${e.mayo_qty} = ${fmtMoney(e.mayo_total || 0)}</div>`;
+        if (e.rent)                details += `<div class="row-sub">🏠 Rent: ${fmtMoney(e.rent)}</div>`;
+
+        const ownerDetails = state.role === 'owner'
+            ? `<div class="row-sub" style="color:var(--green);margin-top:4px">💵 Payment: ${fmtMoney(e.payment || 0)}</div>
+               <div class="row-sub">Prev Balance: ${fmtMoney(e.prev_outstanding || 0)}</div>
+               <div class="row-sub" style="color:${(e.outstanding||0) <= 0 ? 'var(--green)' : 'var(--gold-light)'}">
+                   Outstanding: ${(e.outstanding||0) <= 0 ? 'PAID ✓' : fmtMoney(e.outstanding)}
+               </div>`
+            : '';
+
+        return `<div class="history-entry">
+                    <div class="history-date">${d}</div>
+                    ${details}
+                    <div class="row-sub" style="color:var(--gold-light);font-weight:600;margin-top:6px">
+                        Day Total: ${fmtMoney(e.day_total || 0)}
+                    </div>
+                    ${ownerDetails}
+                </div>`;
+    }).join('');
+
+    // Latest outstanding (across all time, not just range)
+    const allDates    = Object.keys(daily).filter(d => daily[d][name]).sort();
+    const latestEntry = allDates.length ? daily[allDates[allDates.length - 1]][name] : null;
+    const latestOut   = latestEntry ? (latestEntry.outstanding || 0) : 0;
+
+    const ownerSummary = state.role === 'owner'
+        ? `<div class="stat-cell"><div class="stat-label">Total Paid</div><div class="stat-value green">${fmtMoney(totals.paid)}</div></div>
+           <div class="stat-cell accent span2"><div class="stat-label">Current Outstanding</div>
+               <div class="stat-value ${latestOut <= 0 ? 'green' : 'gold'}">${latestOut <= 0 ? 'PAID ✓' : fmtMoney(latestOut)}</div>
+           </div>`
+        : '';
+
+    const billBtn = `<button class="btn btn-primary" style="margin-top:14px"
+        onclick="generateBill('${name}','${from}','${to}')">📄 Generate Bill</button>`;
+
+    content.innerHTML = `
+        <div class="card-premium">
+            <div class="hero">
+                <div class="hero-label">Total Business</div>
+                <div class="hero-value">${fmtMoney(totals.dayTotal)}</div>
+            </div>
+            <div class="gold-rule"></div>
+            <div class="stat-grid">
+                <div class="stat-cell"><div class="stat-label">Small</div><div class="stat-value">${totals.smallQty} pcs<br>${fmtMoney(totals.smallAmt)}</div></div>
+                <div class="stat-cell"><div class="stat-label">Large</div><div class="stat-value">${totals.largeQty} pcs<br>${fmtMoney(totals.largeAmt)}</div></div>
+                <div class="stat-cell"><div class="stat-label">Burger</div><div class="stat-value">${totals.burgerQty} pcs<br>${fmtMoney(totals.burgerAmt)}</div></div>
+                <div class="stat-cell"><div class="stat-label">Butter</div><div class="stat-value">${totals.butterQty} pcs<br>${fmtMoney(totals.butterAmt)}</div></div>
+                <div class="stat-cell"><div class="stat-label">Mayo</div><div class="stat-value">${totals.mayoQty} pcs<br>${fmtMoney(totals.mayoAmt)}</div></div>
+                <div class="stat-cell"><div class="stat-label">Rent</div><div class="stat-value">${fmtMoney(totals.rent)}</div></div>
+                ${ownerSummary}
+            </div>
+            ${billBtn}
+        </div>
+        <div class="card-label" style="margin-bottom:8px">📋 Entries — ${dates.length} days</div>
+        ${entryCards}
+    `;
+}
+
+/* ================================================================
+   OUTSTANDING TAB
+================================================================ */
+function renderOutstanding() {
+    const daily    = state.data.daily;
+    const listEl   = document.getElementById('outstanding-list');
+    const items    = [];
+
+    for (const name of Object.keys(state.data.customers)) {
+        const entrDates = Object.keys(daily).filter(d => daily[d][name]).sort();
+        let amount = 0;
+        let label  = 'No entries yet';
+
+        if (entrDates.length) {
+            amount = daily[entrDates[entrDates.length - 1]][name].outstanding || 0;
+            label  = entrDates[entrDates.length - 1];
+        } else {
+            amount = state.data.customers[name].opening_outstanding || 0;
+        }
+
+        if (amount > 0) items.push({ name, label, amount });
+    }
+
+    if (!items.length) {
+        listEl.innerHTML = '<div class="all-clear">✓ All Accounts Clear</div>';
+        return;
+    }
+
+    // Sort by amount descending
+    items.sort((a, b) => b.amount - a.amount);
+
+    listEl.innerHTML = items.map(i =>
+        `<div class="list-row">
+             <div>
+                 <div class="row-title">${i.name}</div>
+                 <div class="row-sub">${i.label}</div>
+             </div>
+             <span class="badge badge-gold">${fmtMoney(i.amount)}</span>
+         </div>`
+    ).join('');
+}
+
+/* ================================================================
+   DAILY SUMMARY
+================================================================ */
+function renderDailySummary() {
+    const date    = v('sum-date');
+    const entries = state.data.daily[date];
+    const content = document.getElementById('summary-content');
+
+    if (!entries || !Object.keys(entries).length) {
+        showToast('No entries for this date');
+        content.innerHTML = '';
+        return;
+    }
+
+    let t = { small:0, large:0, burger:0, butter:0, mayo:0, rent:0, paid:0, out:0, total:0 };
+
+    const rows = Object.entries(entries).map(([name, e]) => {
+        t.small  += e.shawarma_small_total  || 0;
+        t.large  += e.shawarma_large_total  || 0;
+        t.burger += e.burger_total          || 0;
+        t.butter += e.butter_total          || 0;
+        t.mayo   += e.mayo_total            || 0;
+        t.rent   += e.rent                  || 0;
+        t.paid   += e.payment               || 0;
+        t.out    += Math.max(e.outstanding  || 0, 0);
+        t.total  += e.day_total             || 0;
+
+        const out   = e.outstanding || 0;
+        const badge = state.role === 'owner'
+            ? `<span class="badge ${out <= 0 ? 'badge-green' : 'badge-gold'}">${out <= 0 ? 'Paid' : fmtMoney(out)}</span>`
+            : '';
+
+        return `<div class="list-row">
+                    <div>
+                        <div class="row-title">${name}</div>
+                        <div class="row-sub">Small ${fmtMoney(e.shawarma_small_total||0)} · Large ${fmtMoney(e.shawarma_large_total||0)}</div>
+                        <div class="row-sub">Rent ${fmtMoney(e.rent||0)}</div>
+                    </div>
+                    ${badge}
+                </div>`;
+    }).join('');
+
+    const ownerStats = state.role === 'owner'
+        ? `<div class="stat-cell"><div class="stat-label">Paid</div><div class="stat-value green">${fmtMoney(t.paid)}</div></div>
+           <div class="stat-cell accent span2"><div class="stat-label">Total Outstanding</div><div class="stat-value gold">${fmtMoney(t.out)}</div></div>`
+        : '';
+
+    content.innerHTML = `
+        <div class="card-premium">
+            <div class="hero">
+                <div class="hero-label">Total Revenue — ${date}</div>
+                <div class="hero-value">${fmtMoney(t.total)}</div>
+            </div>
+            <div class="gold-rule"></div>
+            <div class="stat-grid">
+                <div class="stat-cell"><div class="stat-label">Small</div><div class="stat-value">${fmtMoney(t.small)}</div></div>
+                <div class="stat-cell"><div class="stat-label">Large</div><div class="stat-value">${fmtMoney(t.large)}</div></div>
+                <div class="stat-cell"><div class="stat-label">Burger</div><div class="stat-value">${fmtMoney(t.burger)}</div></div>
+                <div class="stat-cell"><div class="stat-label">Butter</div><div class="stat-value">${fmtMoney(t.butter)}</div></div>
+                <div class="stat-cell"><div class="stat-label">Mayo</div><div class="stat-value">${fmtMoney(t.mayo)}</div></div>
+                <div class="stat-cell"><div class="stat-label">Rent</div><div class="stat-value">${fmtMoney(t.rent)}</div></div>
+                ${ownerStats}
+            </div>
+        </div>
+        <div class="card">${rows}</div>`;
+}
+
+/* ================================================================
+   MONTHLY REPORT
+================================================================ */
+function renderMonthlyReport() {
+    const year    = document.getElementById('mon-year').value;
+    const month   = document.getElementById('mon-month').value;
+    const prefix  = `${year}-${month}`;
+    const daily   = state.data.daily;
+    const content = document.getElementById('monthly-content');
+
+    const monthDates = Object.keys(daily).filter(d => d.startsWith(prefix)).sort();
+    if (!monthDates.length) {
+        showToast('No data for this month');
+        content.innerHTML = '';
+        return;
+    }
+
+    const totals = {};
+
+    for (const d of monthDates) {
+        for (const [name, e] of Object.entries(daily[d])) {
+            if (!totals[name]) totals[name] = { small:0, large:0, burger:0, butter:0, mayo:0, rent:0, paid:0 };
+            totals[name].small  += e.shawarma_small_total  || 0;
+            totals[name].large  += e.shawarma_large_total  || 0;
+            totals[name].burger += e.burger_total          || 0;
+            totals[name].butter += e.butter_total          || 0;
+            totals[name].mayo   += e.mayo_total            || 0;
+            totals[name].rent   += e.rent                  || 0;
+            totals[name].paid   += e.payment               || 0;
+        }
+    }
+
+    let grand = { total:0, paid:0, out:0 };
+
+    const rows = Object.entries(totals).map(([name, t]) => {
+        const custTotal = t.small + t.large + t.burger + t.butter + t.mayo + t.rent;
+        grand.total += custTotal;
+        grand.paid  += t.paid;
+
+        // Latest outstanding for this customer in this month
+        const lastMonthDate = monthDates.filter(d => daily[d][name]).sort().pop();
+        const out = lastMonthDate ? (daily[lastMonthDate][name].outstanding || 0) : 0;
+        if (out > 0) grand.out += out;
+
+        const badge = state.role === 'owner'
+            ? `<span class="badge ${out <= 0 ? 'badge-green' : 'badge-gold'}">${out <= 0 ? 'Paid' : fmtMoney(out)}</span>`
+            : '';
+
+        return `<div class="list-row">
+                    <div>
+                        <div class="row-title">${name}</div>
+                        <div class="row-sub">Total: ${fmtMoney(custTotal)}</div>
+                        <div class="row-sub">Rent: ${fmtMoney(t.rent)}</div>
+                    </div>
+                    ${badge}
+                </div>`;
+    }).join('');
+
+    const ownerStats = state.role === 'owner'
+        ? `<div class="stat-cell"><div class="stat-label">Paid</div><div class="stat-value green">${fmtMoney(grand.paid)}</div></div>
+           <div class="stat-cell accent span2"><div class="stat-label">Total Outstanding</div><div class="stat-value gold">${fmtMoney(grand.out)}</div></div>`
+        : '';
+
+    content.innerHTML = `
+        <div class="card-premium">
+            <div class="hero">
+                <div class="hero-label">Monthly Revenue</div>
+                <div class="hero-value">${fmtMoney(grand.total)}</div>
+            </div>
+            <div class="gold-rule"></div>
+            <div class="stat-grid">
+                ${ownerStats}
+            </div>
+        </div>
+        <div class="card">${rows}</div>`;
+}
+
+/* ================================================================
+   HISTORY (day view — all customers)
+================================================================ */
+function renderHistory() {
+    const date    = v('hist-date');
+    const entries = state.data.daily[date];
+    const content = document.getElementById('history-content');
+
+    if (!entries || !Object.keys(entries).length) {
+        showToast('No entries for this date');
+        content.innerHTML = '';
+        return;
+    }
+
+    const rows = Object.entries(entries).map(([name, e]) => {
+        const out   = e.outstanding || 0;
+        const badge = state.role === 'owner'
+            ? `<span class="badge ${out <= 0 ? 'badge-green' : 'badge-gold'}">${out <= 0 ? 'Paid' : fmtMoney(out)}</span>`
+            : '';
+
+        const payInfo = state.role === 'owner'
+            ? `<div class="row-sub">Prev: ${fmtMoney(e.prev_outstanding||0)} · Paid: ${fmtMoney(e.payment||0)}</div>`
+            : '';
+
+        return `<div class="list-row">
+                    <div>
+                        <div class="row-title">${name}</div>
+                        <div class="row-sub">Small ${fmtMoney(e.shawarma_small_total||0)} · Burger ${fmtMoney(e.burger_total||0)}</div>
+                        <div class="row-sub">Day Total: ${fmtMoney(e.day_total||0)}</div>
+                        ${payInfo}
+                    </div>
+                    ${badge}
+                </div>`;
+    }).join('');
+
+    content.innerHTML = `<div class="card">${rows}</div>`;
+}
+
+/* ================================================================
+   BILL GENERATION
+================================================================ */
+function generateBill(name, from, to) {
+    const daily = state.data.daily;
+
+    // Get dates ascending
+    const dates = Object.keys(daily)
+        .filter(d => daily[d][name] !== undefined && d >= from && d <= to)
+        .sort();
+
+    if (!dates.length) { showToast('No entries in this period'); return; }
+
+    // Determine which product columns are needed
+    const cols = {
+        small:  dates.some(d => (daily[d][name].shawarma_small_qty  || 0) > 0),
+        large:  dates.some(d => (daily[d][name].shawarma_large_qty  || 0) > 0),
+        burger: dates.some(d => (daily[d][name].burger_qty           || 0) > 0),
+        butter: dates.some(d => (daily[d][name].butter_qty           || 0) > 0),
+        mayo:   dates.some(d => (daily[d][name].mayo_qty             || 0) > 0),
+        rent:   dates.some(d => (daily[d][name].rent                 || 0) > 0),
+    };
+
+    // Header row
+    let th = '<th>Date</th>';
+    if (cols.small)  th += '<th>Small</th>';
+    if (cols.large)  th += '<th>Large</th>';
+    if (cols.burger) th += '<th>Burger</th>';
+    if (cols.butter) th += '<th>Butter</th>';
+    if (cols.mayo)   th += '<th>Mayo</th>';
+    if (cols.rent)   th += '<th>Rent</th>';
+    th += '<th>Total</th>';
+
+    // Data rows + totals
+    let totals = { small:0, large:0, burger:0, butter:0, mayo:0, rent:0, grand:0 };
+    let tbody   = '';
+
+    // Newest first in table
+    [...dates].reverse().forEach(d => {
+        const e = daily[d][name];
+        let td  = `<td>${d}</td>`;
+        if (cols.small)  { td += `<td>${e.shawarma_small_qty  || ''}</td>`; totals.small  += e.shawarma_small_qty  || 0; }
+        if (cols.large)  { td += `<td>${e.shawarma_large_qty  || ''}</td>`; totals.large  += e.shawarma_large_qty  || 0; }
+        if (cols.burger) { td += `<td>${e.burger_qty           || ''}</td>`; totals.burger += e.burger_qty          || 0; }
+        if (cols.butter) { td += `<td>${e.butter_qty           || ''}</td>`; totals.butter += e.butter_qty          || 0; }
+        if (cols.mayo)   { td += `<td>${e.mayo_qty             || ''}</td>`; totals.mayo   += e.mayo_qty            || 0; }
+        if (cols.rent)   { td += `<td>${e.rent ? Math.round(e.rent) : ''}</td>`; totals.rent += e.rent || 0; }
+        td += `<td>${Math.round(e.day_total || 0).toLocaleString('en-PK')}</td>`;
+        totals.grand += e.day_total || 0;
+        tbody += `<tr>${td}</tr>`;
+    });
+
+    // Summary rows
+    let summaryRows = '';
+    if (cols.small)  summaryRows += `<tr><td>Shawarma Small</td><td>${totals.small} pcs</td></tr>`;
+    if (cols.large)  summaryRows += `<tr><td>Shawarma Large</td><td>${totals.large} pcs</td></tr>`;
+    if (cols.burger) summaryRows += `<tr><td>Burger</td><td>${totals.burger} pcs</td></tr>`;
+    if (cols.butter) summaryRows += `<tr><td>Butter Paper</td><td>${totals.butter} pcs</td></tr>`;
+    if (cols.mayo)   summaryRows += `<tr><td>Mayonnaise</td><td>${totals.mayo} pcs</td></tr>`;
+    if (cols.rent)   summaryRows += `<tr><td>Total Rent</td><td>Rs ${Math.round(totals.rent).toLocaleString('en-PK')}</td></tr>`;
+
+    // Outstanding block (owner only)
+    const latestDate  = dates[dates.length - 1]; // last date in range
+    const latestEntry = daily[latestDate][name];
+    const outstanding = latestEntry.outstanding || 0;
+
+    const outRows = state.role === 'owner'
+        ? `<tr><td>Total Paid</td><td style="color:green">Rs ${Math.round(latestEntry.payment||0).toLocaleString('en-PK')}</td></tr>
+           <tr class="outstanding-row"><td>Outstanding Balance</td>
+               <td style="color:${outstanding <= 0 ? 'green' : 'red'}">
+                   ${outstanding <= 0 ? 'PAID ✓' : 'Rs ' + Math.round(outstanding).toLocaleString('en-PK')}
+               </td>
+           </tr>`
+        : '';
+
+    const billHTML = `
+        <div class="bill-header-section">
+            <div class="bill-company">M.A BAKERS</div>
+            <div class="bill-company-sub">SHAWARMA</div>
+        </div>
+        <div class="bill-meta">
+            <span><strong>M/s:</strong> ${name}</span>
+            <span><strong>Date:</strong> ${new Date().toLocaleDateString('en-PK')}</span>
+        </div>
+        <div class="bill-meta">
+            <span><strong>Period:</strong> ${from} &nbsp;to&nbsp; ${to}</span>
+        </div>
+        <table class="bill-table">
+            <thead><tr>${th}</tr></thead>
+            <tbody>${tbody}</tbody>
+        </table>
+        <table class="bill-summary-table">
+            <tr class="section-head"><td colspan="2">SUMMARY</td></tr>
+            ${summaryRows}
+            <tr class="total-row"><td>Total Amount</td><td>Rs ${Math.round(totals.grand).toLocaleString('en-PK')}</td></tr>
+            ${outRows}
+        </table>
+        <div class="bill-footer">
+            <p>Generated: ${new Date().toLocaleString('en-PK')}</p>
+            <p style="margin-top:28px">_______________________</p>
+            <p>Authorised Signature</p>
+        </div>
+    `;
+
+    document.getElementById('bill-body').innerHTML = billHTML;
+    document.getElementById('bill-overlay').classList.add('show');
+
+    // Share button
+    document.getElementById('share-btn').onclick = () => shareBill(name, from, to);
+}
+
+function closeBill() {
+    document.getElementById('bill-overlay').classList.remove('show');
+}
+
+function shareBill(name, from, to) {
+    const text = buildBillText(name, from, to);
+    if (navigator.share) {
+        navigator.share({ title: `Bill — ${name}`, text })
+            .catch(() => copyText(text));
+    } else {
+        copyText(text);
+    }
+}
+
+function buildBillText(name, from, to) {
+    const daily = state.data.daily;
+    const dates = Object.keys(daily)
+        .filter(d => daily[d][name] !== undefined && d >= from && d <= to)
+        .sort();
+
+    let text  = `*M.A BAKERS — SHAWARMA*\n`;
+    text     += `M/s: ${name}\n`;
+    text     += `Period: ${from} to ${to}\n`;
+    text     += `─────────────────────\n`;
+
+    let grand = 0;
+    dates.forEach(d => {
+        const e    = daily[d][name];
+        let   line = `${d}: `;
+        if (e.shawarma_small_qty)  line += `Small ${e.shawarma_small_qty} `;
+        if (e.shawarma_large_qty)  line += `Large ${e.shawarma_large_qty} `;
+        if (e.burger_qty)          line += `Burger ${e.burger_qty} `;
+        if (e.butter_qty)          line += `Butter ${e.butter_qty} `;
+        if (e.mayo_qty)            line += `Mayo ${e.mayo_qty} `;
+        if (e.rent)                line += `Rent Rs${Math.round(e.rent)} `;
+        line  += `= *Rs ${Math.round(e.day_total||0).toLocaleString('en-PK')}*`;
+        text  += line + '\n';
+        grand += e.day_total || 0;
+    });
+
+    text += `─────────────────────\n`;
+    text += `*Total: Rs ${Math.round(grand).toLocaleString('en-PK')}*\n`;
+
+    if (state.role === 'owner') {
+        const latestDate  = dates[dates.length - 1];
+        const latestEntry = daily[latestDate][name];
+        const out         = latestEntry?.outstanding || 0;
+        text += `*Outstanding: ${out <= 0 ? 'PAID ✓' : 'Rs ' + Math.round(out).toLocaleString('en-PK')}*\n`;
+    }
+
+    return text;
+}
+
+function copyText(text) {
+    const el = document.createElement('textarea');
+    el.value = text;
+    el.style.position = 'fixed';
+    el.style.opacity  = '0';
+    document.body.appendChild(el);
+    el.select();
+    try { document.execCommand('copy'); showToast('✓ Bill copied — paste in WhatsApp'); }
+    catch (_) { showToast('Could not copy'); }
+    document.body.removeChild(el);
+}
+
+/* ================================================================
+   SPLASH & INIT
+================================================================ */
+function initSplash() {
+    setTimeout(() => {
+        document.getElementById('splash-ring').classList.add('show');
+        document.getElementById('splash-title').classList.add('show');
+        document.getElementById('splash-sub').classList.add('show');
+        document.getElementById('splash-line').classList.add('show');
+    }, 100);
+
+    setTimeout(() => {
+        const splash = document.getElementById('splash');
+        splash.style.transition = 'opacity 0.8s ease';
+        splash.style.opacity    = '0';
+
+        setTimeout(() => {
+            splash.remove();
+            const savedRole = localStorage.getItem('ma_role');
+            if (savedRole && PASSWORDS[Object.keys(PASSWORDS).find(k => PASSWORDS[k] === savedRole)]) {
+                state.role = savedRole;
+                applyRole();
+                startAutoSync();
+                buildQuickList();
+            } else {
+                document.getElementById('login-screen').classList.remove('hidden');
+            }
+        }, 800);
+    }, 3000);
+}
+
+function initDates() {
+    const t = todayISO();
+    const now = new Date();
+    set('quick-date',  t);
+    set('detail-date', t);
+    set('sum-date',    t);
+    set('hist-date',   t);
+    set('ch-from',     firstOfMonthISO());
+    set('ch-to',       t);
+    set('mon-year',    now.getFullYear());
+    set('mon-month',   String(now.getMonth() + 1).padStart(2, '0'));
+}
+
+/* ================================================================
+   BOOTSTRAP
+================================================================ */
+loadData();
+initDates();
+renderCustomerList();
+renderOutstanding();
+
+// Enter key on login
+document.getElementById('login-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+});
+
+// Run splash last
+initSplash();
+</script>
+</body>
+</html>
